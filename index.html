@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AICLON Desktop</title>
+    <!-- Google Fonts: Montserrat only (Orbitron removed in favor of local Designer font) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration matching the Design Manual with CSS Variables for Theming -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class', // Enable class-based dark mode (we use .light-theme class to flip variables)
+        theme: {
+          extend: {
+            colors: {
+              // Defined as RGB variables to allow Tailwind opacity modifiers (e.g. bg-night/80)
+              night: 'rgb(var(--color-night) / <alpha-value>)',
+              mist: 'rgb(var(--color-mist) / <alpha-value>)',
+              'mist-muted': 'rgb(var(--color-mist-muted) / <alpha-value>)',
+              'mist-faint': 'rgb(var(--color-mist-faint) / <alpha-value>)',
+              'border-subtle': 'rgb(var(--color-border-subtle) / <alpha-value>)',
+              neon: 'rgb(var(--color-neon) / <alpha-value>)',
+              'neon-blue': 'rgb(var(--color-neon-blue) / <alpha-value>)',
+              'neon-orange': 'rgb(var(--color-neon-orange) / <alpha-value>)',
+              'surface-low': 'rgb(var(--color-surface-low) / <alpha-value>)',
+              'surface-med': 'rgb(var(--color-surface-med) / <alpha-value>)',
+            },
+            fontFamily: {
+              // Using local Designer.otf font
+              designer: ['Designer', 'sans-serif'],
+              montserrat: ['Montserrat', 'sans-serif'],
+            },
+            backgroundImage: {
+              // Gradient uses variables for the stops
+              'gradient-bg': 'linear-gradient(135deg, rgb(var(--color-night)) 0%, rgb(var(--color-bg-gradient-mid)) 40%, rgb(var(--color-night)) 100%)',
+              'gradient-primary': 'linear-gradient(135deg, rgb(var(--color-neon)) 0%, rgb(var(--color-neon-blue)) 100%)',
+            },
+            boxShadow: {
+              'neon-glow': '0 0 18px rgba(0, 200, 255, 0.55)',
+              'card-glow': '0 0 25px rgba(0, 200, 255, 0.18)',
+              'depth': '0 18px 40px rgba(0, 0, 0, 0.9)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Custom Font Definition */
+      @font-face {
+        font-family: 'Designer';
+        src: url('/fonts/Designer.otf') format('opentype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      /* CSS Variables for Theming */
+      :root {
+        /* DEFAULT (DARK/NEON) THEME - RGB Values */
+        --color-night: 4 3 8;           /* #040308 */
+        --color-bg-gradient-mid: 5 8 33; /* #050821 */
+        
+        --color-mist: 247 251 255;      /* #F7FBFF */
+        --color-mist-muted: 157 168 184; /* approx rgba(247, 251, 255, 0.7) blended */
+        --color-mist-faint: 100 110 120; /* approx rgba(247, 251, 255, 0.4) blended */
+        
+        --color-border-subtle: 25 35 45; /* approx rgba(247, 251, 255, 0.08) */
+        
+        --color-neon: 0 200 255;        /* #00C8FF */
+        --color-neon-blue: 0 90 183;    /* #005AB7 */
+        --color-neon-orange: 240 96 0;  /* #F06000 */
+        
+        --color-surface-low: 15 20 30;  /* Slightly lighter than night for cards */
+        --color-surface-med: 20 30 45;  /* Hover state */
+      }
+
+      /* LIGHT THEME OVERRIDES */
+      .light-theme {
+        --color-night: 243 244 246;     /* Light Gray Background (Tailwind gray-100) */
+        --color-bg-gradient-mid: 229 231 235; /* Slightly darker gray for gradient */
+        
+        --color-mist: 17 24 39;         /* Dark Text (Tailwind gray-900) */
+        --color-mist-muted: 75 85 99;   /* Gray Text (Tailwind gray-600) */
+        --color-mist-faint: 156 163 175; /* Light Gray Text */
+        
+        --color-border-subtle: 209 213 219; /* Light Border */
+        
+        --color-neon: 0 160 220;        /* Slightly darker Blue for contrast on white */
+        --color-neon-blue: 0 70 160;    
+        --color-neon-orange: 220 80 0;
+        
+        --color-surface-low: 255 255 255; /* White Cards */
+        --color-surface-med: 249 250 251; /* Off-white hover */
+      }
+
+      body {
+        background-color: rgb(var(--color-night));
+        color: rgb(var(--color-mist));
+        font-family: 'Montserrat', sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Custom scrollbar for webkit */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgb(var(--color-night)); 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgb(var(--color-border-subtle)); 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgb(var(--color-neon-blue)); 
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
