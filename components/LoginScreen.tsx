@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import AiclonLogo from './Logo';
 
 interface LoginScreenProps {
-  onLogin: (email: string, pass: string) => void;
+  onLogin: (email: string, pass: string) => void | Promise<void>;
   onForgotPassword: () => void;
   authError?: string | null;
 }

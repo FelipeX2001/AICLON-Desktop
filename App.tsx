@@ -16,7 +16,7 @@ import BotVersionsView from './components/BotVersionsView';
 import TutorialsView from './components/TutorialsView';
 import UserEditModal from './components/UserEditModal';
 import { User, Task, MeetingEvent, ActiveClient, Lead, Notification } from './types';
-import { authAPI } from './api';
+import { authAPI } from './client';
 
 // Helper for simple hashing (For localStorage data only - DB uses bcrypt)
 const hashPassword = (pwd: string) => btoa(pwd).split('').reverse().join(''); 
