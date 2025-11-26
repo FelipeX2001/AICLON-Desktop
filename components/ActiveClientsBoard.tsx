@@ -185,7 +185,7 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({ user, users }) 
                         {/* Info Grid */}
                         <div className="space-y-2 mb-3 text-xs">
                             <div className="flex items-center text-mist-muted">
-                                <User size={12} className="mr-2 text-mist-muted" />
+                                <UserIcon size={12} className="mr-2 text-mist-muted" />
                                 <span className="truncate">{client.nombre_contacto || 'Sin encargado'}</span>
                             </div>
                             <div className="flex items-center text-mist-muted">
