@@ -85,9 +85,13 @@ npm run dev
 ```
 
 ## Deployment
-Static site deployment configured with:
-- Build: `npm run build`
-- Output: `dist` directory
+Deployment configured with autoscale:
+- Build: `npm run build` (builds frontend to dist/)
+- Run: `npm run start` (starts Express server in production mode)
+- The Express server serves both:
+  - API routes at `/api/*`
+  - Static frontend files from `dist/` directory
+- Production port: 3001 (configurable via PORT env variable)
 
 ## Recent Changes (Nov 26, 2025)
 - Integrated NeonDB PostgreSQL database for secure data persistence
@@ -98,3 +102,5 @@ Static site deployment configured with:
 - Renamed API client file from `api.ts` to `client.ts` (avoid proxy conflict)
 - Set up two-workflow system: Frontend and Backend API
 - Admin user seeded in database with forced password change on first login
+- Configured deployment with autoscale: Express serves both API and static frontend
+- Added production mode to Express server to serve built frontend files
