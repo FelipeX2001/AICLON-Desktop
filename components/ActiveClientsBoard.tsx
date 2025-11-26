@@ -1,10 +1,15 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ActiveClient, ACTIVE_CLIENT_STAGES, ActiveClientStage, DroppedClient } from '../types';
+import { ActiveClient, ACTIVE_CLIENT_STAGES, ActiveClientStage, DroppedClient, User } from '../types';
 import ActiveClientModal from './ActiveClientModal';
-import { GripVertical, Building2, MapPin, DollarSign, Calendar, Clock, CheckSquare, User } from 'lucide-react';
+import { GripVertical, Building2, MapPin, DollarSign, Calendar, Clock, CheckSquare, User as UserIcon } from 'lucide-react';
 
-const ActiveClientsBoard: React.FC = () => {
+interface ActiveClientsBoardProps {
+    user?: User;
+    users?: User[];
+}
+
+const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({ user, users }) => {
   // State
   const [activeClients, setActiveClients] = useState<ActiveClient[]>(() => {
     try {
@@ -117,13 +122,6 @@ const ActiveClientsBoard: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex justify-between items-center mb-6 px-1">
-        <div>
-          <h2 className="text-3xl font-designer text-mist">Clientes Activos</h2>
-          <p className="text-mist-muted text-sm mt-1">Gestión de servicios, facturación y desarrollos.</p>
-        </div>
-      </div>
-
       <div 
         ref={scrollContainerRef}
         className="flex-1 overflow-x-auto pb-4 cursor-grab active:cursor-grabbing select-none"
@@ -243,6 +241,7 @@ const ActiveClientsBoard: React.FC = () => {
         onSave={handleSaveClient}
         onDelete={handleDeleteClient}
         onDrop={handleDropClient}
+        isAdmin={user?.role === 'admin'}
       />
     </div>
   );

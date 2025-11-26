@@ -32,11 +32,7 @@ const TeamView: React.FC<TeamViewProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-end border-b border-border-subtle pb-4">
-        <div>
-          <h2 className="text-3xl font-designer text-mist">Equipo</h2>
-          <p className="text-mist-muted text-sm mt-1">Gestiona los miembros y roles de tu organización.</p>
-        </div>
+      <div className="flex justify-end items-end border-b border-border-subtle pb-4">
         <div className="flex items-center space-x-4">
             {currentUser.role === 'admin' && (
                 <button 

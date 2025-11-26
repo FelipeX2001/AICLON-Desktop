@@ -20,6 +20,18 @@ interface DashboardLayoutProps {
   onMarkNotificationRead?: (id: string) => void;
 }
 
+const VIEW_TITLES: Record<string, string> = {
+  'dashboard': 'Dashboard',
+  'tasks': 'Tareas',
+  'meetings': 'Reuniones',
+  'team': 'Equipo',
+  'bot-versions': 'Bot versions',
+  'tutorials': 'Tutoriales',
+  'clients-general': 'Todos',
+  'clients-active': 'Actuales',
+  'clients-process': 'En proceso'
+};
+
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
   children, 
   user, 
@@ -91,6 +103,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     if (window.innerWidth < 1024) setIsSidebarOpen(false);
   };
 
+  const pageTitle = VIEW_TITLES[currentView] || currentView;
+
   return (
     <div className="flex h-screen overflow-hidden bg-night">
       {isSidebarOpen && <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />}
@@ -150,7 +164,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         <header className="h-20 bg-night/80 backdrop-blur-md border-b border-border-subtle flex items-center justify-between px-4 lg:px-8 z-30 sticky top-0 transition-colors duration-300">
           <div className="flex items-center space-x-4">
             <button onClick={toggleSidebar} className="p-2 rounded-lg text-mist hover:bg-surface-low lg:hidden"><Menu size={24} /></button>
-            <h2 className="hidden md:block text-4xl font-designer text-mist pt-1 uppercase">{currentView.replace(/-/g, ' ')}</h2>
+            <h2 className="hidden md:block text-4xl font-designer text-mist pt-1">{pageTitle}</h2>
           </div>
           <div className="flex items-center space-x-4 lg:space-x-6">
             <button onClick={onToggleTheme} className="p-2 text-mist-muted hover:text-neon transition-colors rounded-lg hover:bg-surface-low">

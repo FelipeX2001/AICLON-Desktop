@@ -181,11 +181,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users }) => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-           <h2 className="text-3xl font-designer text-mist">Tareas</h2>
-           <p className="text-mist-muted text-sm mt-1">Gestión operativa y seguimiento por estados.</p>
-        </div>
+      <div className="flex justify-end items-center mb-6">
         <button 
           onClick={openCreateModal}
           className="px-6 py-2.5 rounded-lg bg-gradient-primary text-mist font-bold shadow-neon-glow hover:brightness-110 flex items-center"

@@ -252,11 +252,7 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users }) => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex justify-between items-center mb-6 px-1">
-        <div>
-          <h2 className="text-3xl font-designer text-mist">Clientes en Proceso</h2>
-          <p className="text-mist-muted text-sm mt-1">Gestiona el flujo de leads desde el primer contacto hasta el cierre.</p>
-        </div>
+      <div className="flex justify-end items-center mb-6 px-1">
         <button 
           onClick={openCreateModal}
           className="px-6 py-2.5 rounded-lg bg-gradient-primary text-mist font-bold shadow-neon-glow hover:brightness-110 transition-all flex items-center"
@@ -286,7 +282,7 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users }) => {
                 onDrop={(e) => handleDrop(e, stage)}
               >
                 <div className="p-3 bg-surface-med border-b border-border-subtle flex justify-between items-center sticky top-0 z-10">
-                  <span className="font-bold text-sm text-mist uppercase tracking-wide truncate max-w-[200px]" title={stage}>
+                  <span className="font-bold text-sm text-mist uppercase tracking-wide truncate" title={stage}>
                     {stage}
                   </span>
                   <span className="bg-night border border-border-subtle text-neon text-xs font-bold px-2 py-0.5 rounded-full">

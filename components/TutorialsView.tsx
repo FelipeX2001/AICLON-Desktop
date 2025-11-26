@@ -49,8 +49,7 @@ const TutorialsView: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-designer text-mist">Tutoriales</h2>
+      <div className="flex justify-end items-center mb-6">
         <button 
           onClick={openNewModal}
           className="px-6 py-2.5 rounded-lg bg-gradient-primary text-mist font-bold shadow-neon-glow hover:brightness-110 transition-all flex items-center"
