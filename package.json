@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && tsc -p tsconfig.server.json",
     "preview": "vite preview",
     "server": "node --loader ts-node/esm server/index.ts",
     "server:dev": "node --watch --loader ts-node/esm server/index.ts",
-    "start": "node --loader ts-node/esm server/index.ts",
+    "start": "node dist-server/index.js",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
