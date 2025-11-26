@@ -86,12 +86,13 @@ npm run dev
 
 ## Deployment
 Deployment configured with autoscale:
-- Build: `npm run build` (builds frontend to dist/)
-- Run: `npm run start` (starts Express server in production mode)
+- Build: `npm run build` (compiles frontend to dist/ and backend to dist-server/)
+- Run: `npm run start` (runs compiled backend JavaScript from dist-server/index.js)
 - The Express server serves both:
   - API routes at `/api/*`
   - Static frontend files from `dist/` directory
-- Production port: 3001 (configurable via PORT env variable)
+- Production port: 5000 (configurable via PORT env variable)
+- Backend runs compiled JavaScript (no ts-node overhead) for faster startup
 
 ## Recent Changes (Nov 26, 2025)
 - Integrated NeonDB PostgreSQL database for secure data persistence
@@ -103,4 +104,5 @@ Deployment configured with autoscale:
 - Set up two-workflow system: Frontend and Backend API
 - Admin user seeded in database with forced password change on first login
 - Configured deployment with autoscale: Express serves both API and static frontend
-- Added production mode to Express server to serve built frontend files
+- Added TypeScript compilation for backend to avoid ts-node overhead in production
+- Fixed deployment issues: port 5000, 0.0.0.0 binding, compiled JS execution
