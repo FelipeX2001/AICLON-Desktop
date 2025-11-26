@@ -6,6 +6,7 @@ import { Plus, GripVertical, Building2, MapPin, User as UserIcon, Briefcase, Arr
 
 interface LeadBoardProps {
   user?: User; 
+  users?: User[];
 }
 
 const DEFAULT_MILESTONES: LeadMilestones = {
@@ -67,7 +68,7 @@ const DEFAULT_LEADS: Lead[] = [
   }
 ];
 
-const LeadBoard: React.FC<LeadBoardProps> = ({ user }) => {
+const LeadBoard: React.FC<LeadBoardProps> = ({ user, users }) => {
   // --- STATE ---
   const [leads, setLeads] = useState<Lead[]>(() => {
     try {
@@ -113,12 +114,13 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user }) => {
   };
 
   const handleDeleteLead = (leadId: string) => {
-    setLeads(prev => prev.filter(l => l.id !== leadId));
+    // Soft Delete
+    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, isDeleted: true, deletedAt: new Date().toISOString() } : l));
     setIsModalOpen(false);
   };
 
   const handleDropLead = (dropped: DroppedClient) => {
-      // 1. Save to dropped
+      // 1. Save to dropped (historical record)
       try {
           const existing = localStorage.getItem('aiclon_dropped_clients');
           const droppedList = existing ? JSON.parse(existing) : [];
@@ -128,8 +130,10 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user }) => {
           console.error("Error saving dropped client", e);
       }
 
-      // 2. Remove from leads
-      setLeads(prev => prev.filter(l => l.id !== dropped.originalId));
+      // 2. Soft Delete / Move out of active board
+      // We treat 'Dropped' as a status that hides it from board, effectively 'isDeleted' or similar logic.
+      // For historical integrity, we can mark isDeleted=true here too as it's moved to another DB.
+      setLeads(prev => prev.map(l => l.id === dropped.originalId ? { ...l, isDeleted: true, deletedAt: new Date().toISOString() } : l));
       setIsModalOpen(false);
   };
 
@@ -177,13 +181,20 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user }) => {
           const clients = existing ? JSON.parse(existing) : [];
           clients.push(newActiveClient);
           localStorage.setItem('aiclon_active_clients', JSON.stringify(clients));
+          
+          // 3. UPDATE LEAD STATUS: Mark as converted so it disappears from board
+          setLeads(prev => prev.map(l => 
+              l.id === leadToConvert.id 
+              ? { ...l, isConverted: true } 
+              : l
+          ));
+
           alert('Lead convertido exitosamente a Cliente Activo!');
       } catch (err) {
           console.error("Error saving active client", err);
           alert('Error al convertir lead.');
       }
 
-      // 3. Optional: Update Lead Status? (Leaving as Lead Cerrado for now)
       setIsConversionModalOpen(false);
       setLeadToConvert(null);
   };
@@ -264,7 +275,8 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user }) => {
       >
         <div className="flex h-full space-x-4 min-w-max px-1">
           {LEAD_STAGES.map((stage) => {
-            const stageLeads = leads.filter(l => l.etapa === stage);
+            // FILTER LOGIC: Not deleted AND Not Converted
+            const stageLeads = leads.filter(l => l.etapa === stage && !l.isDeleted && !l.isConverted);
             
             return (
               <div 

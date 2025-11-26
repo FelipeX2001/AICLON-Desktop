@@ -5,9 +5,10 @@ import AiclonLogo from './Logo';
 interface LoginScreenProps {
   onLogin: (email: string, pass: string) => void;
   onForgotPassword: () => void;
+  authError?: string | null;
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onForgotPassword }) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onForgotPassword, authError }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -29,6 +30,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onForgotPassword }) 
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {authError && (
+              <div className="p-3 rounded bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold text-center animate-in fade-in">
+                  {authError}
+              </div>
+          )}
+
           <div className="space-y-2">
             <label className="text-xs font-semibold text-mist-muted uppercase tracking-wider">Email</label>
             <input

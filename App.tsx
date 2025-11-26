@@ -25,6 +25,7 @@ const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [showForceChangePassword, setShowForceChangePassword] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   
   // --- NAVIGATION & THEME ---
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -114,14 +115,17 @@ const App: React.FC = () => {
 
   // --- AUTH HANDLERS ---
   const handleLogin = (email: string, pass: string) => {
+      setAuthError(null); // Reset error
       const user = users.find(u => u.email === email && !u.isDeleted);
       
+      const GENERIC_ERROR = "Hubo un error en el usuario o la contraseña.";
+
       if (!user) {
-          alert("Credenciales incorrectas.");
+          setAuthError(GENERIC_ERROR);
           return;
       }
       if (!user.isActive) {
-          alert("Este usuario ha sido desactivado.");
+          setAuthError("Este usuario ha sido desactivado.");
           return;
       }
       const inputHash = hashPassword(pass);
@@ -134,7 +138,7 @@ const App: React.FC = () => {
               setCurrentView('dashboard');
           }
       } else {
-          alert("Credenciales incorrectas.");
+          setAuthError(GENERIC_ERROR);
       }
   };
 
@@ -169,6 +173,7 @@ const App: React.FC = () => {
     setIsAuthenticated(false);
     setCurrentUser(null);
     setCurrentView('dashboard');
+    setAuthError(null);
   };
 
   // --- NOTIFICATION LOGIC ---
@@ -267,14 +272,6 @@ const App: React.FC = () => {
       case 'clients-active':
         return <ActiveClientsBoard user={currentUser!} users={validUsers} />;
       case 'tasks':
-        // We need to pass setTasks to TaskBoard to use the wrapped handleSaveTask? 
-        // Ideally TaskBoard calls App handler. For now, TaskBoard has internal state but syncs to localstorage.
-        // Refactoring TaskBoard to use props for saving is better, but to minimize friction I will just pass the props and let TaskBoard use internal state synced with this one or refactor TaskBoard to use props.
-        // Given constraints, I will Assume TaskBoard was refactored to accept onSaveTask prop OR I update TaskBoard here.
-        // I will update TaskBoard's usage implicitly by ensuring it pulls from localStorage which App updates? No, App is source of truth.
-        // I will pass the list. TaskBoard likely needs refactor to accept `onSave` prop to trigger notification logic in App.
-        // For this prompt, I updated App logic but TaskBoard logic in previous file used internal state. 
-        // I will assume TaskBoard receives the data.
         return <TaskBoard user={currentUser!} users={validUsers} />;
       case 'meetings':
         return <MeetingsView user={currentUser!} users={validUsers} />;
@@ -299,7 +296,11 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen w-full bg-night text-mist font-montserrat transition-colors duration-300">
       {!isAuthenticated && currentView !== 'forgot-password' && currentView !== 'reset-password' ? (
-        <LoginScreen onLogin={handleLogin} onForgotPassword={() => setCurrentView('forgot-password')} />
+        <LoginScreen 
+            onLogin={handleLogin} 
+            onForgotPassword={() => setCurrentView('forgot-password')} 
+            authError={authError}
+        />
       ) : !isAuthenticated ? (
          renderContent()
       ) : (

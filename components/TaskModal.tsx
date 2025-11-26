@@ -55,10 +55,22 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.title && formData.assigneeId && formData.clientName) {
-      onSave({
+      const newTaskData: any = {
         ...formData,
         id: taskToEdit?.id || Date.now().toString(),
-      } as Task);
+      };
+
+      // Handle completedAt logic manually
+      if (formData.status === TaskStatus.Completed && (!taskToEdit || taskToEdit.status !== TaskStatus.Completed)) {
+          newTaskData.completedAt = new Date().toISOString();
+      } else if (formData.status !== TaskStatus.Completed) {
+          newTaskData.completedAt = undefined;
+      } else if (taskToEdit?.status === TaskStatus.Completed) {
+          // Keep existing date if already completed
+          newTaskData.completedAt = taskToEdit.completedAt;
+      }
+
+      onSave(newTaskData as Task);
     }
   };
 

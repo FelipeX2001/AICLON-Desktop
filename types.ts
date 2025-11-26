@@ -57,13 +57,14 @@ export enum TaskPriority {
 export interface Task extends BaseEntity {
   id: string;
   title: string;
-  description?: string; // New Field
+  description?: string; 
   status: TaskStatus;
   assigneeId: string;
   clientName: string;
   priority: TaskPriority;
   deadline: string; // YYYY-MM-DD
   comments?: string;
+  completedAt?: string; // New Field for archiving logic
 }
 
 export interface Meeting {
@@ -143,6 +144,7 @@ export interface Lead extends BaseEntity {
   id: string;
   etapa: LeadStage;
   assignedUserId?: string; 
+  isConverted?: boolean; // New Flag: Logic deletion from Lead Board
   
   // Contact Info
   nombre_empresa: string;

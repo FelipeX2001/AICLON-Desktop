@@ -5,14 +5,14 @@ import TaskModal from './TaskModal';
 import { Plus, Search, Filter, Calendar, User as UserIcon, CheckCircle2, AlertTriangle, GripVertical, Building2, Clock } from 'lucide-react';
 
 interface TaskBoardProps {
-  user: User; // Current User
-  users: User[]; // All users for dropdown
+  user: User; 
+  users: User[]; 
 }
 
 const DEFAULT_TASKS: Task[] = [
   { id: '1', title: 'Configurar servidor VPS', status: TaskStatus.Pending, assigneeId: '2', clientName: 'TechCorp', priority: TaskPriority.High, deadline: '2025-11-20' },
   { id: '2', title: 'Diseñar flujo de conversación', status: TaskStatus.InProcess, assigneeId: '1', clientName: 'Imperio de la Moda', priority: TaskPriority.Urgent, deadline: '2025-11-15' },
-  { id: '3', title: 'Revisión mensual de métricas', status: TaskStatus.Completed, assigneeId: '3', clientName: 'Dr. Jhon García', priority: TaskPriority.Medium, deadline: '2025-11-01' },
+  { id: '3', title: 'Revisión mensual de métricas', status: TaskStatus.Completed, assigneeId: '3', clientName: 'Dr. Jhon García', priority: TaskPriority.Medium, deadline: '2025-11-01', completedAt: '2025-11-02T10:00:00Z' },
 ];
 
 const TaskBoard: React.FC<TaskBoardProps> = ({ user, users }) => {
@@ -24,7 +24,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users }) => {
     } catch { return DEFAULT_TASKS; }
   });
 
-  // Load Clients (Both Actual and Leads for dropdowns)
+  // Load Clients
   const [clients, setClients] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -39,8 +39,26 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users }) => {
     localStorage.setItem('aiclon_tasks', JSON.stringify(tasks));
   }, [tasks]);
 
+  // --- CRON JOB SIMULATION: ARCHIVE OLD TASKS ---
   useEffect(() => {
-    // Aggregate client names from both sources
+      const now = new Date();
+      const MS_IN_DAY = 24 * 60 * 60 * 1000;
+      const ARCHIVE_THRESHOLD_DAYS = 14;
+
+      setTasks(prev => prev.map(t => {
+          if (t.status === TaskStatus.Completed && t.completedAt) {
+              const completedDate = new Date(t.completedAt);
+              const diffDays = (now.getTime() - completedDate.getTime()) / MS_IN_DAY;
+              
+              if (diffDays > ARCHIVE_THRESHOLD_DAYS && !t.isDeleted) {
+                  return { ...t, isDeleted: true, deletedAt: now.toISOString() }; // Soft Delete
+              }
+          }
+          return t;
+      }));
+  }, []); // Runs once on mount
+
+  useEffect(() => {
     const currentClientsStr = localStorage.getItem('aiclon_current_clients');
     const leadsStr = localStorage.getItem('aiclon_leads');
     
@@ -50,7 +68,6 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users }) => {
         if (l.nombre_empresa) clientNames.add(l.nombre_empresa);
         else if (l.nombre_contacto) clientNames.add(l.nombre_contacto);
     });
-    // Add default clients if empty for demo
     if (clientNames.size === 0) {
         ['TechCorp', 'Imperio de la Moda', 'Dr. Jhon García', 'Witnam'].forEach(n => clientNames.add(n));
     }
@@ -67,7 +84,8 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users }) => {
   };
 
   const handleDeleteTask = (taskId: string) => {
-    setTasks(prev => prev.filter(t => t.id !== taskId));
+    // Soft Delete
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, isDeleted: true, deletedAt: new Date().toISOString() } : t));
     setIsModalOpen(false);
   };
 
@@ -98,13 +116,25 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users }) => {
     const task = tasks.find(t => t.id === taskId);
     
     if (task && task.status !== status) {
-      setTasks(prev => prev.map(t => 
-        t.id === taskId ? { ...t, status: status } : t
-      ));
+      setTasks(prev => prev.map(t => {
+        if (t.id === taskId) {
+            const updates: Partial<Task> = { status };
+            // Set completedAt if moving TO Completed
+            if (status === TaskStatus.Completed && t.status !== TaskStatus.Completed) {
+                updates.completedAt = new Date().toISOString();
+            }
+            // Clear completedAt if moving OUT of Completed
+            if (status !== TaskStatus.Completed && t.status === TaskStatus.Completed) {
+                updates.completedAt = undefined;
+            }
+            return { ...t, ...updates };
+        }
+        return t;
+      }));
     }
   };
 
-  // --- DRAG TO SCROLL (BOARD) HANDLERS ---
+  // --- DRAG TO SCROLL ---
   const handleMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('.task-card')) return;
     isDraggingScroll.current = true;
@@ -115,16 +145,8 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users }) => {
     }
   };
 
-  const handleMouseLeave = () => {
-    isDraggingScroll.current = false;
-    if (scrollContainerRef.current) scrollContainerRef.current.style.cursor = 'grab';
-  };
-
-  const handleMouseUp = () => {
-    isDraggingScroll.current = false;
-    if (scrollContainerRef.current) scrollContainerRef.current.style.cursor = 'grab';
-  };
-
+  const handleMouseLeave = () => { isDraggingScroll.current = false; if (scrollContainerRef.current) scrollContainerRef.current.style.cursor = 'grab'; };
+  const handleMouseUp = () => { isDraggingScroll.current = false; if (scrollContainerRef.current) scrollContainerRef.current.style.cursor = 'grab'; };
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDraggingScroll.current || !scrollContainerRef.current) return;
     e.preventDefault();
@@ -143,7 +165,6 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users }) => {
     }
   };
 
-  // Sort tasks: Priority then Deadline
   const getSortedTasks = (statusTasks: Task[]) => {
       const priorityWeight = {
         [TaskPriority.Urgent]: 4,
@@ -183,7 +204,8 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users }) => {
       >
         <div className="flex h-full space-x-4 min-w-max px-1">
             {Object.values(TaskStatus).map((status) => {
-                const statusTasks = tasks.filter(t => t.status === status);
+                // Filter out Soft Deleted tasks
+                const statusTasks = tasks.filter(t => t.status === status && !t.isDeleted);
                 const sortedStatusTasks = getSortedTasks(statusTasks);
 
                 return (
@@ -225,7 +247,6 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users }) => {
                                                 <GripVertical size={14} />
                                             </div>
                                             
-                                            {/* Priority Badge */}
                                             <div className="mb-2">
                                                 <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded border ${getPriorityColor(task.priority)}`}>
                                                     {task.priority}
