@@ -16,8 +16,9 @@ import BotVersionsView from './components/BotVersionsView';
 import TutorialsView from './components/TutorialsView';
 import UserEditModal from './components/UserEditModal';
 import { User, Task, MeetingEvent, ActiveClient, Lead, Notification } from './types';
+import { authAPI } from './api';
 
-// Helper for simple hashing (In prod use bcrypt/argon2)
+// Helper for simple hashing (For localStorage data only - DB uses bcrypt)
 const hashPassword = (pwd: string) => btoa(pwd).split('').reverse().join(''); 
 
 const App: React.FC = () => {
@@ -114,22 +115,11 @@ const App: React.FC = () => {
   useEffect(() => localStorage.setItem('aiclon_theme', theme), [theme]);
 
   // --- AUTH HANDLERS ---
-  const handleLogin = (email: string, pass: string) => {
-      setAuthError(null); // Reset error
-      const user = users.find(u => u.email === email && !u.isDeleted);
-      
-      const GENERIC_ERROR = "Hubo un error en el usuario o la contraseña.";
-
-      if (!user) {
-          setAuthError(GENERIC_ERROR);
-          return;
-      }
-      if (!user.isActive) {
-          setAuthError("Este usuario ha sido desactivado.");
-          return;
-      }
-      const inputHash = hashPassword(pass);
-      if (user.passwordHash === inputHash) {
+  const handleLogin = async (email: string, pass: string) => {
+      setAuthError(null);
+      try {
+          const response = await authAPI.login(email, pass);
+          const user = response.user as User;
           setCurrentUser(user);
           setIsAuthenticated(true);
           if (user.mustChangePassword) {
@@ -137,23 +127,25 @@ const App: React.FC = () => {
           } else {
               setCurrentView('dashboard');
           }
-      } else {
-          setAuthError(GENERIC_ERROR);
+      } catch (error: any) {
+          setAuthError(error.message || "Hubo un error en el usuario o la contraseña.");
       }
   };
 
-  const handleForcePasswordChange = (newPassword: string) => {
+  const handleForcePasswordChange = async (newPassword: string) => {
       if (!currentUser) return;
-      const updatedUser = { 
-          ...currentUser, 
-          passwordHash: hashPassword(newPassword), 
-          mustChangePassword: false 
-      };
-      // Direct state update to bypass restrictions on own user edit in generic handler
-      setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
-      setCurrentUser(updatedUser);
-      setShowForceChangePassword(false);
-      alert("Contraseña actualizada correctamente.");
+      try {
+          await authAPI.changePassword(Number(currentUser.id), newPassword);
+          const updatedUser = { 
+              ...currentUser, 
+              mustChangePassword: false 
+          };
+          setCurrentUser(updatedUser);
+          setShowForceChangePassword(false);
+          alert("Contraseña actualizada correctamente.");
+      } catch (error: any) {
+          alert("Error al cambiar la contraseña: " + error.message);
+      }
   };
 
   const handleCreateUser = (newUser: User & { tempPassword?: string }) => {
