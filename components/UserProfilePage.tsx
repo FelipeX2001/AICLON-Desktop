@@ -47,7 +47,7 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({
 
   const userTasks = tasks.filter(t => t.assigneeId === user.id && !t.isDeleted);
   const userMeetings = meetings.filter(m => m.attendeeIds.includes(user.id) && !m.isDeleted);
-  const userClients = activeClients.filter(c => !c.isDeleted);
+  const userClients = activeClients.filter(c => c.assignedUserId === user.id && !c.isDeleted);
 
   const isMe = user.id === currentUser.id;
 
