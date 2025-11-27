@@ -108,47 +108,59 @@ const App: React.FC = () => {
         attendeeIds: (m.attendeeIds || []).map(String)
       })));
       
-      setLeads(leadsData.map((l: any) => ({
-        ...l,
-        id: String(l.id),
-        assignedUserId: l.assignedUserId ? String(l.assignedUserId) : undefined,
-        nombre_empresa: l.nombre_empresa || l.nombreEmpresa,
-        nombre_contacto: l.nombre_contacto || l.nombreContacto,
-        email_secundario: l.email_secundario || l.emailSecundario,
-        fuente_origen: l.fuente_origen || l.fuenteOrigen,
-        servicio_interes: l.servicio_interes || l.servicioInteres,
-        fecha_envio_propuesta: l.fecha_envio_propuesta || l.fechaEnvioPropuesta,
-        valor_implementacion: l.valor_implementacion || l.valorImplementacion,
-        valor_mensualidad: l.valor_mensualidad || l.valorMensualidad,
-        fecha_primer_contacto: l.fecha_primer_contacto || l.fechaPrimerContacto,
-        resultado_final: l.resultado_final || l.resultadoFinal,
-        fecha_cierre_real: l.fecha_cierre_real || l.fechaCierreReal,
-        coverUrl: l.coverUrl,
-        coverPosition: l.coverPosition
-      })));
+      setLeads(leadsData.map((l: any) => {
+        const rawServicio = l.servicio_interes || l.servicioInteres;
+        const servicioInteres = Array.isArray(rawServicio) 
+          ? rawServicio 
+          : (rawServicio ? [rawServicio] : []);
+        return {
+          ...l,
+          id: String(l.id),
+          assignedUserId: l.assignedUserId ? String(l.assignedUserId) : undefined,
+          nombre_empresa: l.nombre_empresa || l.nombreEmpresa,
+          nombre_contacto: l.nombre_contacto || l.nombreContacto,
+          email_secundario: l.email_secundario || l.emailSecundario,
+          fuente_origen: l.fuente_origen || l.fuenteOrigen,
+          servicio_interes: servicioInteres,
+          fecha_envio_propuesta: l.fecha_envio_propuesta || l.fechaEnvioPropuesta,
+          valor_implementacion: l.valor_implementacion || l.valorImplementacion,
+          valor_mensualidad: l.valor_mensualidad || l.valorMensualidad,
+          fecha_primer_contacto: l.fecha_primer_contacto || l.fechaPrimerContacto,
+          resultado_final: l.resultado_final || l.resultadoFinal,
+          fecha_cierre_real: l.fecha_cierre_real || l.fechaCierreReal,
+          coverUrl: l.coverUrl,
+          coverPosition: l.coverPosition
+        };
+      }));
       
-      setActiveClients(activeClientsData.map((ac: any) => ({
-        ...ac,
-        id: String(ac.activeId || ac.id),
-        activeId: String(ac.activeId || ac.id),
-        leadId: ac.leadId ? String(ac.leadId) : undefined,
-        nombre_empresa: ac.nombreEmpresa,
-        nombre_contacto: ac.nombreContacto,
-        email_secundario: ac.emailSecundario,
-        fuente_origen: ac.fuenteOrigen,
-        servicio_interes: ac.servicioInteres,
-        fecha_envio_propuesta: ac.fechaEnvioPropuesta,
-        valor_implementacion: ac.valorImplementacion,
-        valor_mensualidad: ac.valorMensualidad,
-        fecha_primer_contacto: ac.fechaPrimerContacto,
-        resultado_final: ac.resultadoFinal,
-        fecha_cierre_real: ac.fechaCierreReal,
-        fecha_inicio_servicio: ac.fechaInicioServicio,
-        fecha_corte: ac.fechaCorte,
-        pago_mes_actual: ac.pagoMesActual,
-        estado_servicio: ac.estadoServicio,
-        valor_mensual_servicio: ac.valorMensualServicio
-      })));
+      setActiveClients(activeClientsData.map((ac: any) => {
+        const rawServicio = ac.servicioInteres;
+        const servicioInteres = Array.isArray(rawServicio) 
+          ? rawServicio 
+          : (rawServicio ? [rawServicio] : []);
+        return {
+          ...ac,
+          id: String(ac.activeId || ac.id),
+          activeId: String(ac.activeId || ac.id),
+          leadId: ac.leadId ? String(ac.leadId) : undefined,
+          nombre_empresa: ac.nombreEmpresa,
+          nombre_contacto: ac.nombreContacto,
+          email_secundario: ac.emailSecundario,
+          fuente_origen: ac.fuenteOrigen,
+          servicio_interes: servicioInteres,
+          fecha_envio_propuesta: ac.fechaEnvioPropuesta,
+          valor_implementacion: ac.valorImplementacion,
+          valor_mensualidad: ac.valorMensualidad,
+          fecha_primer_contacto: ac.fechaPrimerContacto,
+          resultado_final: ac.resultadoFinal,
+          fecha_cierre_real: ac.fechaCierreReal,
+          fecha_inicio_servicio: ac.fechaInicioServicio,
+          fecha_corte: ac.fechaCorte,
+          pago_mes_actual: ac.pagoMesActual,
+          estado_servicio: ac.estadoServicio,
+          valor_mensual_servicio: ac.valorMensualServicio
+        };
+      }));
       
       setBotVersions(botVersionsData.map((bv: any) => ({
         ...bv,

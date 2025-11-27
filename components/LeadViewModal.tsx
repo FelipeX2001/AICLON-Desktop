@@ -86,11 +86,11 @@ const LeadViewModal: React.FC<LeadViewModalProps> = ({
               <span className={`px-2 py-1 rounded text-xs font-bold ${getStageColor(lead.etapa)}`}>
                 {lead.etapa}
               </span>
-              {lead.servicio_interes && (
-                <span className="px-2 py-1 rounded text-xs font-bold bg-neon-blue/20 text-neon-blue">
-                  {lead.servicio_interes}
+              {lead.servicio_interes && Array.isArray(lead.servicio_interes) && lead.servicio_interes.map((servicio, idx) => (
+                <span key={idx} className="px-2 py-1 rounded text-xs font-bold bg-neon-blue/20 text-neon-blue">
+                  {servicio}
                 </span>
-              )}
+              ))}
             </div>
           </div>
 

@@ -191,11 +191,15 @@ const ActiveClientViewModal: React.FC<ActiveClientViewModalProps> = ({
             </div>
           </div>
 
-          {client.servicio_interes && (
+          {client.servicio_interes && Array.isArray(client.servicio_interes) && client.servicio_interes.length > 0 && (
             <div className="space-y-1">
               <label className="text-xs uppercase font-bold text-mist-muted">Servicio Contratado</label>
-              <div className="bg-surface-low/50 rounded-lg p-2 border border-border-subtle">
-                <span className="text-sm text-mist">{client.servicio_interes}</span>
+              <div className="bg-surface-low/50 rounded-lg p-2 border border-border-subtle flex flex-wrap gap-2">
+                {client.servicio_interes.map((servicio, idx) => (
+                  <span key={idx} className="px-2 py-1 rounded text-xs font-bold bg-neon-blue/20 text-neon-blue">
+                    {servicio}
+                  </span>
+                ))}
               </div>
             </div>
           )}

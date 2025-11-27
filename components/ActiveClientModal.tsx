@@ -197,7 +197,7 @@ const ActiveClientModal: React.FC<ActiveClientModalProps> = ({
                             <div><label className="block text-[10px] text-mist-muted uppercase">Sector</label><p className="text-mist">{formData.sector}</p></div>
                             <div><label className="block text-[10px] text-mist-muted uppercase">Ciudad</label><p className="text-mist">{formData.ciudad}</p></div>
                             <div><label className="block text-[10px] text-mist-muted uppercase">Origen</label><p className="text-mist">{formData.fuente_origen}</p></div>
-                            <div><label className="block text-[10px] text-mist-muted uppercase">Servicio Interés</label><p className="text-mist text-neon-blue">{formData.servicio_interes}</p></div>
+                            <div><label className="block text-[10px] text-mist-muted uppercase">Servicio Interés</label><p className="text-mist text-neon-blue">{Array.isArray(formData.servicio_interes) ? formData.servicio_interes.join(', ') : formData.servicio_interes}</p></div>
                         </div>
                     </div>
 

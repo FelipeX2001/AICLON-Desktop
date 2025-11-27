@@ -196,7 +196,11 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
                           </div>
                           <div className="flex items-center text-mist-muted">
                             <Building2 size={12} className="mr-2 text-mist-muted" />
-                            <span className="truncate">{client.servicio_interes || 'Servicio N/A'}</span>
+                            <span className="truncate">
+                              {Array.isArray(client.servicio_interes) 
+                                ? (client.servicio_interes.length > 0 ? client.servicio_interes.join(', ') : 'Servicio N/A')
+                                : (client.servicio_interes || 'Servicio N/A')}
+                            </span>
                           </div>
                           <div className="flex items-center text-mist-muted">
                             <Clock size={12} className="mr-2 text-neon-orange" />
