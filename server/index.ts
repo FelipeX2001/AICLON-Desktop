@@ -10,9 +10,11 @@ import tasksRoutes from './routes/tasks.js';
 import meetingsRoutes from './routes/meetings.js';
 import leadsRoutes from './routes/leads.js';
 import activeClientsRoutes from './routes/activeClients.js';
+import droppedClientsRoutes from './routes/droppedClients.js';
 import botVersionsRoutes from './routes/botVersions.js';
 import tutorialsRoutes from './routes/tutorials.js';
 import notificationsRoutes from './routes/notifications.js';
+import demosRoutes from './routes/demos.js';
 
 dotenv.config();
 
@@ -31,9 +33,11 @@ app.use('/api/tasks', tasksRoutes);
 app.use('/api/meetings', meetingsRoutes);
 app.use('/api/leads', leadsRoutes);
 app.use('/api/active-clients', activeClientsRoutes);
+app.use('/api/dropped-clients', droppedClientsRoutes);
 app.use('/api/bot-versions', botVersionsRoutes);
 app.use('/api/tutorials', tutorialsRoutes);
 app.use('/api/notifications', notificationsRoutes);
+app.use('/api/demos', demosRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });

@@ -172,6 +172,36 @@ export const notifications = pgTable('notifications', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+export const droppedClients = pgTable('dropped_clients', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }),
+  telefono: varchar('telefono', { length: 50 }),
+  sector: varchar('sector', { length: 255 }),
+  ciudad: varchar('ciudad', { length: 255 }),
+  servicioContratado: varchar('servicio_contratado', { length: 255 }),
+  fechaInicio: varchar('fecha_inicio', { length: 50 }),
+  fechaFin: varchar('fecha_fin', { length: 50 }),
+  razonAbandono: text('razon_abandono'),
+  valorMensualidad: varchar('valor_mensualidad', { length: 100 }),
+  isDeleted: boolean('is_deleted').default(false),
+  deletedAt: timestamp('deleted_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const demos = pgTable('demos', {
+  id: serial('id').primaryKey(),
+  number: varchar('number', { length: 50 }),
+  name: varchar('name', { length: 255 }).notNull(),
+  client: varchar('client', { length: 255 }),
+  url: varchar('url', { length: 500 }),
+  isDeleted: boolean('is_deleted').default(false),
+  deletedAt: timestamp('deleted_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Task = typeof tasks.$inferSelect;
@@ -188,3 +218,7 @@ export type Tutorial = typeof tutorials.$inferSelect;
 export type InsertTutorial = typeof tutorials.$inferInsert;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
+export type DroppedClient = typeof droppedClients.$inferSelect;
+export type InsertDroppedClient = typeof droppedClients.$inferInsert;
+export type Demo = typeof demos.$inferSelect;
+export type InsertDemo = typeof demos.$inferInsert;
