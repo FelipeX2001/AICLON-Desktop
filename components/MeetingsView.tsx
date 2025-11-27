@@ -121,7 +121,7 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users }) => {
   };
 
   // --- RENDER HELPERS ---
-  const hours = Array.from({ length: 14 }, (_, i) => i + 7); // 7:00 to 20:00
+  const hours = Array.from({ length: 12 }, (_, i) => i + 8); // 8:00 to 19:00
 
   const getEventStyle = (event: MeetingEvent) => {
     const startH = parseInt(event.startTime.split(':')[0]);
@@ -129,8 +129,8 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users }) => {
     const endH = parseInt(event.endTime.split(':')[0]);
     const endM = parseInt(event.endTime.split(':')[1]);
 
-    const startMinutes = (startH - 7) * 60 + startM;
-    const endMinutes = (endH - 7) * 60 + endM;
+    const startMinutes = (startH - 8) * 60 + startM;
+    const endMinutes = (endH - 8) * 60 + endM;
     const duration = endMinutes - startMinutes;
 
     return {
@@ -184,7 +184,7 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users }) => {
 
         {/* Body Grid (Hours) */}
         <div className="flex-1 overflow-y-auto custom-scrollbar relative">
-          <div className="flex min-h-[1120px]"> {/* 14 hours * 80px */}
+          <div className="flex min-h-[960px]"> {/* 12 hours * 80px */}
             
             {/* Time Column */}
             <div className="w-16 flex-shrink-0 border-r border-border-subtle bg-surface-low">
@@ -259,8 +259,8 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users }) => {
                        const now = new Date();
                        const currentHour = now.getHours();
                        const currentMin = now.getMinutes();
-                       if (currentHour >= 7 && currentHour < 21) {
-                           const top = ((currentHour - 7) * 60 + currentMin) / 60 * 80;
+                       if (currentHour >= 8 && currentHour < 20) {
+                           const top = ((currentHour - 8) * 60 + currentMin) / 60 * 80;
                            const dayIndex = (now.getDay() + 6) % 7; // Mon=0, Sat=5
                            if (dayIndex < 6) {
                                return (

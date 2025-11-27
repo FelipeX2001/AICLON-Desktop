@@ -40,8 +40,8 @@ const MeetingModal: React.FC<MeetingModalProps> = ({
       } else {
         setFormData({
           date: new Date().toISOString().split('T')[0],
-          startTime: '09:00',
-          endTime: '10:00',
+          startTime: '10:00',
+          endTime: '11:00',
           attendeeIds: [],
           title: '',
           description: '',
@@ -73,9 +73,18 @@ const MeetingModal: React.FC<MeetingModalProps> = ({
 
   if (!isOpen) return null;
 
+  const isTimeInRange = (time: string, minHour: number, maxHour: number): boolean => {
+    const [h] = time.split(':').map(Number);
+    return h >= minHour && h < maxHour;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.title && formData.date && formData.startTime && formData.endTime) {
+      if (!isTimeInRange(formData.startTime, 8, 19) || !isTimeInRange(formData.endTime, 8, 20)) {
+        alert('Las reuniones deben estar entre 8:00 AM y 7:00 PM');
+        return;
+      }
       onSave({
         ...formData,
         id: meetingToEdit?.id || Date.now().toString(),
