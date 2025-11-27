@@ -500,36 +500,14 @@ const App: React.FC = () => {
         setLeads(prev => prev.map(l => l.id === lead.id ? {
           ...updated,
           id: String(updated.id),
-          assignedUserId: updated.assignedUserId ? String(updated.assignedUserId) : undefined,
-          nombre_empresa: updated.nombreEmpresa,
-          nombre_contacto: updated.nombreContacto,
-          email_secundario: updated.emailSecundario,
-          fuente_origen: updated.fuenteOrigen,
-          servicio_interes: updated.servicioInteres,
-          fecha_envio_propuesta: updated.fechaEnvioPropuesta,
-          valor_implementacion: updated.valorImplementacion,
-          valor_mensualidad: updated.valorMensualidad,
-          fecha_primer_contacto: updated.fechaPrimerContacto,
-          resultado_final: updated.resultadoFinal,
-          fecha_cierre_real: updated.fechaCierreReal
+          assignedUserId: updated.assignedUserId ? String(updated.assignedUserId) : undefined
         } : l));
       } else {
         const created = await leadsAPI.create(leadData);
         setLeads(prev => [...prev, {
           ...created,
           id: String(created.id),
-          assignedUserId: created.assignedUserId ? String(created.assignedUserId) : undefined,
-          nombre_empresa: created.nombreEmpresa,
-          nombre_contacto: created.nombreContacto,
-          email_secundario: created.emailSecundario,
-          fuente_origen: created.fuenteOrigen,
-          servicio_interes: created.servicioInteres,
-          fecha_envio_propuesta: created.fechaEnvioPropuesta,
-          valor_implementacion: created.valorImplementacion,
-          valor_mensualidad: created.valorMensualidad,
-          fecha_primer_contacto: created.fechaPrimerContacto,
-          resultado_final: created.resultadoFinal,
-          fecha_cierre_real: created.fechaCierreReal
+          assignedUserId: created.assignedUserId ? String(created.assignedUserId) : undefined
         }]);
       }
     } catch (error: any) {
