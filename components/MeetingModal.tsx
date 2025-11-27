@@ -12,6 +12,7 @@ interface MeetingModalProps {
   meetingToEdit?: MeetingEvent | null;
   users: User[];
   clients: string[];
+  defaultAttendeeId?: string;
 }
 
 const MeetingModal: React.FC<MeetingModalProps> = ({ 
@@ -21,7 +22,8 @@ const MeetingModal: React.FC<MeetingModalProps> = ({
   onDelete, 
   meetingToEdit, 
   users, 
-  clients 
+  clients,
+  defaultAttendeeId 
 }) => {
   const [formData, setFormData] = useState<Partial<MeetingEvent>>({
     date: new Date().toISOString().split('T')[0],
@@ -42,7 +44,7 @@ const MeetingModal: React.FC<MeetingModalProps> = ({
           date: new Date().toISOString().split('T')[0],
           startTime: '10:00',
           endTime: '11:00',
-          attendeeIds: [],
+          attendeeIds: defaultAttendeeId ? [defaultAttendeeId] : [],
           title: '',
           description: '',
           link: '',

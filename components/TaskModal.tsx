@@ -12,6 +12,7 @@ interface TaskModalProps {
   taskToEdit?: Task | null;
   users: User[];
   clients: string[];
+  defaultAssigneeId?: string;
 }
 
 const TaskModal: React.FC<TaskModalProps> = ({ 
@@ -21,7 +22,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
     onDelete, 
     taskToEdit, 
     users, 
-    clients 
+    clients,
+    defaultAssigneeId 
 }) => {
   const [formData, setFormData] = useState<Partial<Task>>({
     status: TaskStatus.Pending,
@@ -43,7 +45,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 status: TaskStatus.Pending,
                 priority: TaskPriority.Medium,
                 deadline: new Date().toISOString().split('T')[0],
-                assigneeId: '',
+                assigneeId: defaultAssigneeId || '',
                 clientName: '',
                 description: '',
                 subtasks: [],
