@@ -138,14 +138,14 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
       >
-        <div className="flex h-full space-x-4 min-w-max px-1">
+        <div className="flex h-full space-x-4 px-1 md:min-w-0 min-w-max">
           {ACTIVE_CLIENT_STAGES.map((stage) => {
             const stageClients = validClients.filter(c => c.estado_servicio === stage);
             
             return (
               <div 
                 key={stage}
-                className="w-80 flex flex-col bg-surface-low/50 border border-border-subtle rounded-xl overflow-hidden"
+                className="w-80 md:w-auto md:flex-1 md:min-w-[280px] flex flex-col bg-surface-low/50 border border-border-subtle rounded-xl overflow-hidden"
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, stage)}
               >

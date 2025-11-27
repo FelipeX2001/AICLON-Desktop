@@ -11,6 +11,7 @@ interface LeadBoardProps {
   leads: Lead[];
   onSaveLead: (lead: Lead) => void;
   onDeleteLead: (leadId: string) => void;
+  onConvertToActiveClient?: (activeClient: ActiveClient) => void;
 }
 
 const DEFAULT_MILESTONES: LeadMilestones = {
@@ -23,7 +24,7 @@ const DEFAULT_MILESTONES: LeadMilestones = {
   ia_activada: false
 };
 
-const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, onDeleteLead }) => {
+const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, onDeleteLead, onConvertToActiveClient }) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
@@ -106,7 +107,21 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
     };
     onSaveLead(convertedLead);
 
-    alert('Lead convertido exitosamente a Cliente Activo! Por favor, ve a Clientes Activos para completar la configuración.');
+    if (onConvertToActiveClient) {
+      const newActiveClient: ActiveClient = {
+        ...leadToConvert,
+        activeId: `temp_${Date.now()}`,
+        leadId: leadToConvert.id,
+        fecha_inicio_servicio: conversionData.fecha_inicio,
+        fecha_corte: conversionData.fecha_corte,
+        pago_mes_actual: conversionData.pago_mes,
+        estado_servicio: 'En servicio',
+        valor_mensual_servicio: conversionData.valor_mensual || leadToConvert.valor_mensualidad || ''
+      };
+      onConvertToActiveClient(newActiveClient);
+    }
+
+    alert('Lead convertido exitosamente a Cliente Activo!');
 
     setIsConversionModalOpen(false);
     setLeadToConvert(null);

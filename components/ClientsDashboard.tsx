@@ -128,7 +128,7 @@ const ClientsDashboard: React.FC<ClientsDashboardProps> = ({
                                   <h4 className="font-bold text-mist group-hover:text-neon">{client.nombre_empresa}</h4>
                                   <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
                                      client.estado_servicio === 'En servicio' ? 'bg-neon/10 text-neon' : 
-                                     client.estado_servicio === 'Pendiente de pago' ? 'bg-neon-orange/10 text-neon-orange' : 'bg-blue-500/10 text-blue-500'
+                                     client.estado_servicio === 'Pendiente de factura' ? 'bg-neon-orange/10 text-neon-orange' : 'bg-blue-500/10 text-blue-500'
                                   }`}>
                                      {client.estado_servicio}
                                   </span>

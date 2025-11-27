@@ -902,6 +902,7 @@ const App: React.FC = () => {
             leads={validLeads}
             onSaveLead={handleSaveLead}
             onDeleteLead={handleDeleteLead}
+            onConvertToActiveClient={handleSaveActiveClient}
           />
         );
       case 'clients-general':

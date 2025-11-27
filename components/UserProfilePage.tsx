@@ -778,7 +778,7 @@ const UserClientsTab: React.FC<UserClientsTabProps> = ({ clients }) => {
               <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
                 client.estado_servicio === 'En servicio' 
                   ? 'bg-neon/10 text-neon border border-neon/30'
-                  : client.estado_servicio === 'Pendiente de pago'
+                  : client.estado_servicio === 'Pendiente de factura'
                   ? 'bg-neon-orange/10 text-neon-orange border border-neon-orange/30'
                   : 'bg-neon-blue/10 text-neon-blue border border-neon-blue/30'
               }`}>

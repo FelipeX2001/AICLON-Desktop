@@ -24,7 +24,7 @@ const ActiveClientViewModal: React.FC<ActiveClientViewModalProps> = ({
   const getStatusColor = (status: string) => {
     switch(status) {
       case 'En servicio': return 'bg-[#00C8FF]/20 text-[#00C8FF]';
-      case 'Pendiente de pago': return 'bg-[#F06000]/20 text-[#F06000]';
+      case 'Pendiente de factura': return 'bg-[#F06000]/20 text-[#F06000]';
       case 'Desarrollos extra': return 'bg-[#005AB7]/20 text-[#005AB7]';
       default: return 'bg-surface-low text-mist';
     }

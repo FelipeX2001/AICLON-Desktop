@@ -190,7 +190,7 @@ export interface CurrentClient extends BaseEntity {
 }
 
 // --- ACTIVE CLIENTS BOARD TYPES ---
-export const ACTIVE_CLIENT_STAGES = ['En servicio', 'Pendiente de pago', 'Desarrollos extra'] as const;
+export const ACTIVE_CLIENT_STAGES = ['En servicio', 'Pendiente de factura', 'Desarrollos extra'] as const;
 export type ActiveClientStage = typeof ACTIVE_CLIENT_STAGES[number];
 
 export interface ActiveClient extends Lead {
