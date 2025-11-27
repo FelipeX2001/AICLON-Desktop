@@ -24,10 +24,12 @@ const DEFAULT_MILESTONES: LeadMilestones = {
   ia_activada: false
 };
 
+const SERVICIOS_DISPONIBLES = ['Agente IA', 'Pagina Web'] as const;
+
 const DEFAULT_LEAD: Partial<Lead> = {
   etapa: 'En Espera',
   hitos: DEFAULT_MILESTONES,
-  servicio_interes: 'Agente IA'
+  servicio_interes: ['Agente IA']
 };
 
 interface InputFieldProps {
@@ -250,18 +252,39 @@ const LeadModal: React.FC<LeadModalProps> = ({
               {/* Column 2: Service Info */}
               <div className="space-y-4">
                 <h4 className="font-designer text-lg text-mist border-b border-border-subtle pb-2 mb-4">Servicio</h4>
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-1.5">
                     <CheckSquare size={14} /> Servicio de Interés
                   </label>
-                  <select
-                    value={formData.servicio_interes || 'Agente IA'}
-                    onChange={(e) => handleInputChange('servicio_interes', e.target.value)}
-                    className="w-full bg-surface-low border border-border-subtle rounded p-2 text-mist text-sm focus:border-neon focus:outline-none"
-                  >
-                    <option value="Agente IA">Agente IA</option>
-                    <option value="Pagina Web">Pagina Web</option>
-                  </select>
+                  <div className="bg-surface-low border border-border-subtle rounded p-3 space-y-2">
+                    {SERVICIOS_DISPONIBLES.map((servicio) => {
+                      const servicios = formData.servicio_interes || [];
+                      const isChecked = servicios.includes(servicio);
+                      return (
+                        <label key={servicio} className="flex items-center gap-3 cursor-pointer group">
+                          <div 
+                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                              isChecked 
+                                ? 'bg-neon border-neon' 
+                                : 'bg-night border-mist-muted group-hover:border-neon'
+                            }`}
+                            onClick={() => {
+                              const currentServicios = formData.servicio_interes || [];
+                              const newServicios = isChecked
+                                ? currentServicios.filter(s => s !== servicio)
+                                : [...currentServicios, servicio];
+                              setFormData(prev => ({ ...prev, servicio_interes: newServicios }));
+                            }}
+                          >
+                            {isChecked && <CheckSquare size={14} className="text-night" strokeWidth={3} />}
+                          </div>
+                          <span className={`text-sm ${isChecked ? 'text-neon font-medium' : 'text-mist'}`}>
+                            {servicio}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
                 <InputField label="Necesidad" value={formData.necesidad} onChange={(v) => handleInputChange('necesidad', v)} type="textarea" icon={<MessageSquare size={14}/>} />
                 <div className="grid grid-cols-2 gap-4 items-start">
