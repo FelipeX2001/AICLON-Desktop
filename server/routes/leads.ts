@@ -92,11 +92,14 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('[DEBUG] Lead update - received coverUrl:', req.body.coverUrl ? 'YES (length: ' + req.body.coverUrl.length + ')' : 'NO');
     const leadData = transformLeadFromClient(req.body);
+    console.log('[DEBUG] Lead update - transformed coverUrl:', leadData.coverUrl ? 'YES' : 'NO');
     const [updatedLead] = await db.update(leads)
       .set({ ...leadData, updatedAt: new Date() })
       .where(eq(leads.id, Number(id)))
       .returning();
+    console.log('[DEBUG] Lead update - saved coverUrl:', updatedLead.coverUrl ? 'YES' : 'NO');
     res.json(transformLeadForClient(updatedLead));
   } catch (error) {
     console.error('Update lead error:', error);

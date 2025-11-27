@@ -197,7 +197,9 @@ const LeadModal: React.FC<LeadModalProps> = ({
                 {/* Cover Image Field */}
                 <ImageUploadField 
                     value={formData.coverUrl} 
-                    onChange={(url) => handleInputChange('coverUrl', url)} 
+                    onChange={(url) => setFormData(prev => ({...prev, coverUrl: url}))}
+                    onPositionChange={(pos) => setFormData(prev => ({...prev, coverPosition: pos}))}
+                    position={formData.coverPosition}
                 />
 
                 <InputField label="Empresa / Cliente" value={formData.nombre_empresa} onChange={(v) => handleInputChange('nombre_empresa', v)} icon={<Building size={14}/>} placeholder="Ej. Tech Solutions SAS" />
