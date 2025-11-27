@@ -111,6 +111,13 @@ Deployment configured with autoscale:
 - Backend runs compiled JavaScript (no ts-node overhead) for faster startup
 
 ## Recent Changes (Nov 27, 2025)
+- **Full-page Tutorial System**: Tutoriales ahora son páginas completas en lugar de modales
+  - TutorialPage.tsx: Página de visualización con banner, título, descripción, links, pasos y media
+  - TutorialEditPage.tsx: Página de edición completa solo para admins
+  - TutorialsView.tsx: Click en tutorial navega a página completa
+  - Nuevo campo `steps` en schema para contenido paso a paso
+  - Flujo: Lista → Ver tutorial → Editar (solo admins) → Ver actualizado
+- **Meeting Schema Fix**: Corregido campo clientId de serial a integer nullable para permitir reuniones sin cliente
 - **View Modal Pattern**: All entity boards now follow consistent view → edit modal pattern
   - LeadViewModal.tsx: Read-only lead details with edit button
   - ActiveClientViewModal.tsx: Read-only client details with edit button
