@@ -340,6 +340,7 @@ const App: React.FC = () => {
           priority: task.priority,
           deadline: task.deadline,
           comments: task.comments,
+          subtasks: task.subtasks || [],
           completedAt: task.completedAt,
           coverUrl: task.coverUrl,
           coverPosition: task.coverPosition
@@ -363,6 +364,7 @@ const App: React.FC = () => {
           priority: task.priority,
           deadline: task.deadline,
           comments: task.comments,
+          subtasks: task.subtasks || [],
           coverUrl: task.coverUrl,
           coverPosition: task.coverPosition
         });

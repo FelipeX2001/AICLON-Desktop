@@ -204,7 +204,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users, tasks, onSaveTask, o
                         className="task-card bg-night border border-border-subtle rounded-lg hover:border-neon/50 hover:shadow-card-glow transition-all cursor-pointer group relative flex flex-col shadow-sm overflow-hidden"
                       >
                         {task.coverUrl && (
-                          <div className="h-24 w-full relative border-b border-border-subtle -mt-px -mx-px w-[calc(100%+2px)] rounded-t-lg mb-3">
+                          <div className="h-36 w-full relative border-b border-border-subtle -mt-px -mx-px w-[calc(100%+2px)] rounded-t-lg mb-3">
                             <img src={task.coverUrl} alt="Cover" className="w-full h-full object-cover" />
                           </div>
                         )}
