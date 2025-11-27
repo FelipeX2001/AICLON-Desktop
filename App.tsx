@@ -52,6 +52,7 @@ const App: React.FC = () => {
   const [tutorials, setTutorials] = useState<Tutorial[]>([]);
   const [demos, setDemos] = useState<Demo[]>([]);
   const [droppedClients, setDroppedClients] = useState<DroppedClient[]>([]);
+  const [botListCovers, setBotListCovers] = useState<Record<string, string>>({});
 
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
@@ -732,6 +733,10 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSaveBotListCover = (type: string, coverUrl: string) => {
+    setBotListCovers(prev => ({ ...prev, [type]: coverUrl }));
+  };
+
   const handleOpenEditProfile = (user: User) => {
     setUserToEdit(user);
     setIsEditProfileOpen(true);
@@ -829,8 +834,10 @@ const App: React.FC = () => {
           <BotVersionsView 
             user={currentUser!}
             botVersions={validBotVersions}
+            botListCovers={botListCovers}
             onSaveBotVersion={handleSaveBotVersion}
             onDeleteBotVersion={handleDeleteBotVersion}
+            onSaveBotListCover={handleSaveBotListCover}
           />
         );
       case 'tutorials':

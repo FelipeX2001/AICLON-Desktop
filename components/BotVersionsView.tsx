@@ -8,22 +8,21 @@ import ImageUploadField from './ImageUploadField';
 interface BotVersionsViewProps {
   user?: User;
   botVersions: BotVersion[];
+  botListCovers: Record<string, string>;
   onSaveBotVersion: (version: BotVersion) => void;
   onDeleteBotVersion: (versionId: string) => void;
+  onSaveBotListCover: (type: BotType, coverUrl: string) => void;
 }
 
 const BotVersionsView: React.FC<BotVersionsViewProps> = ({ 
   user, 
   botVersions,
+  botListCovers,
   onSaveBotVersion,
-  onDeleteBotVersion
+  onDeleteBotVersion,
+  onSaveBotListCover
 }) => {
-  const [listCovers, setListCovers] = useState<Record<string, string>>(() => {
-    try {
-      const saved = localStorage.getItem('aiclon_bot_covers');
-      return saved ? JSON.parse(saved) : {};
-    } catch { return {}; }
-  });
+  const listCovers = botListCovers;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentType, setCurrentType] = useState<BotType>('evolution');
@@ -65,9 +64,7 @@ const BotVersionsView: React.FC<BotVersionsViewProps> = ({
 
   const saveCover = () => {
     if (coverTypeToEdit) {
-      const newCovers = { ...listCovers, [coverTypeToEdit]: tempCoverUrl };
-      setListCovers(newCovers);
-      localStorage.setItem('aiclon_bot_covers', JSON.stringify(newCovers));
+      onSaveBotListCover(coverTypeToEdit, tempCoverUrl);
       setIsCoverModalOpen(false);
     }
   };
