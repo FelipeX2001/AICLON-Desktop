@@ -771,6 +771,8 @@ const App: React.FC = () => {
             demos={validDemos}
             onSaveDemo={handleSaveDemo}
             onDeleteDemo={handleDeleteDemo}
+            onSaveTask={handleSaveTask}
+            onDeleteTask={handleDeleteTask}
           />
         );
       case 'team':
@@ -863,6 +865,8 @@ const App: React.FC = () => {
             demos={validDemos}
             onSaveDemo={handleSaveDemo}
             onDeleteDemo={handleDeleteDemo}
+            onSaveTask={handleSaveTask}
+            onDeleteTask={handleDeleteTask}
           />
         );
     }

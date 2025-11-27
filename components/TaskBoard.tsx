@@ -2,7 +2,8 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { Task, TaskStatus, TaskPriority, User, Lead } from '../types';
 import TaskModal from './TaskModal';
-import { Plus, GripVertical, Building2, Clock, User as UserIcon } from 'lucide-react';
+import TaskViewModal from './TaskViewModal';
+import { Plus, GripVertical, Building2, Clock, User as UserIcon, ListChecks } from 'lucide-react';
 
 interface TaskBoardProps {
   user: User; 
@@ -13,8 +14,9 @@ interface TaskBoardProps {
 }
 
 const TaskBoard: React.FC<TaskBoardProps> = ({ user, users, tasks, onSaveTask, onDeleteTask }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isDraggingScroll = useRef(false);
@@ -34,24 +36,44 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users, tasks, onSaveTask, o
 
   const handleSaveTask = (task: Task) => {
     onSaveTask(task);
-    setIsModalOpen(false);
-    setEditingTask(null);
+    setIsEditModalOpen(false);
+    setIsViewModalOpen(false);
+    setSelectedTask(null);
   };
 
   const handleDeleteTask = (taskId: string) => {
     onDeleteTask(taskId);
-    setIsModalOpen(false);
-    setEditingTask(null);
+    setIsEditModalOpen(false);
+    setIsViewModalOpen(false);
+    setSelectedTask(null);
   };
 
   const openCreateModal = () => {
-    setEditingTask(null);
-    setIsModalOpen(true);
+    setSelectedTask(null);
+    setIsEditModalOpen(true);
   };
 
-  const openEditModal = (task: Task) => {
-    setEditingTask(task);
-    setIsModalOpen(true);
+  const openViewModal = (task: Task) => {
+    setSelectedTask(task);
+    setIsViewModalOpen(true);
+  };
+
+  const openEditFromView = () => {
+    setIsViewModalOpen(false);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSubtaskToggle = (taskId: string, subtaskId: string, completed: boolean) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    const updatedSubtasks = (task.subtasks || []).map(s => 
+      s.id === subtaskId ? { ...s, completed } : s
+    );
+    
+    const updatedTask = { ...task, subtasks: updatedSubtasks };
+    onSaveTask(updatedTask);
+    setSelectedTask(updatedTask);
   };
 
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
@@ -168,12 +190,17 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users, tasks, onSaveTask, o
                 <div className="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
                   {sortedStatusTasks.map((task) => {
                     const assignee = users.find(u => u.id === task.assigneeId);
+                    const subtasks = task.subtasks || [];
+                    const completedSubtasks = subtasks.filter(s => s.completed).length;
+                    const totalSubtasks = subtasks.length;
+                    const progressPercent = totalSubtasks > 0 ? Math.round((completedSubtasks / totalSubtasks) * 100) : 0;
+                    
                     return (
                       <div
                         key={task.id}
                         draggable
                         onDragStart={(e) => handleDragStart(e, task.id)}
-                        onClick={() => openEditModal(task)}
+                        onClick={() => openViewModal(task)}
                         className="task-card bg-night border border-border-subtle rounded-lg hover:border-neon/50 hover:shadow-card-glow transition-all cursor-pointer group relative flex flex-col shadow-sm overflow-hidden"
                       >
                         {task.coverUrl && (
@@ -196,6 +223,24 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users, tasks, onSaveTask, o
                           <h4 className="font-montserrat font-bold text-mist text-sm mb-3 pr-4 leading-tight">
                             {task.title}
                           </h4>
+
+                          {totalSubtasks > 0 && (
+                            <div className="mb-3 space-y-1">
+                              <div className="flex items-center justify-between text-[10px] text-mist-muted">
+                                <span className="flex items-center gap-1">
+                                  <ListChecks size={10} />
+                                  {completedSubtasks}/{totalSubtasks}
+                                </span>
+                                <span>{progressPercent}%</span>
+                              </div>
+                              <div className="w-full bg-surface-low rounded-full h-1.5 overflow-hidden">
+                                <div 
+                                  className="h-full bg-gradient-to-r from-neon to-neon-blue transition-all duration-300"
+                                  style={{ width: `${progressPercent}%` }}
+                                />
+                              </div>
+                            </div>
+                          )}
 
                           <div className="mt-auto space-y-2">
                             <div className="flex items-center text-xs text-mist-muted">
@@ -238,12 +283,29 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users, tasks, onSaveTask, o
         </div>
       </div>
 
+      {selectedTask && (
+        <TaskViewModal 
+          isOpen={isViewModalOpen}
+          onClose={() => {
+            setIsViewModalOpen(false);
+            setSelectedTask(null);
+          }}
+          task={selectedTask}
+          users={users}
+          onEdit={openEditFromView}
+          onSubtaskToggle={handleSubtaskToggle}
+        />
+      )}
+
       <TaskModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedTask(null);
+        }}
         onSave={handleSaveTask}
         onDelete={handleDeleteTask}
-        taskToEdit={editingTask}
+        taskToEdit={selectedTask}
         users={users}
         clients={clients}
       />

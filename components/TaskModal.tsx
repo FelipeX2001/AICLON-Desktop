@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Task, TaskStatus, TaskPriority, User } from '../types';
-import { X, Save, CheckSquare, User as UserIcon, Building2, AlertTriangle, Calendar, Trash2, AlignLeft } from 'lucide-react';
+import { Task, TaskStatus, TaskPriority, User, Subtask } from '../types';
+import { X, Save, CheckSquare, User as UserIcon, Building2, AlertTriangle, Calendar, Trash2, AlignLeft, ListChecks, Plus, Minus } from 'lucide-react';
 import ImageUploadField from './ImageUploadField';
 
 interface TaskModalProps {
@@ -30,11 +30,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
   });
 
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [hasSubtasks, setHasSubtasks] = useState(false);
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
 
   useEffect(() => {
     if (isOpen) {
         if (taskToEdit) {
             setFormData({ ...taskToEdit });
+            setHasSubtasks((taskToEdit.subtasks?.length || 0) > 0);
         } else {
             setFormData({
                 status: TaskStatus.Pending,
@@ -43,12 +46,43 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 assigneeId: '',
                 clientName: '',
                 description: '',
+                subtasks: [],
                 coverPosition: { x: 50, y: 50, zoom: 1 }
             });
+            setHasSubtasks(false);
         }
         setIsDeleteConfirmOpen(false);
+        setNewSubtaskTitle('');
     }
   }, [isOpen, taskToEdit]);
+
+  const addSubtask = () => {
+    if (!newSubtaskTitle.trim()) return;
+    const newSubtask: Subtask = {
+      id: Date.now().toString(),
+      title: newSubtaskTitle.trim(),
+      completed: false
+    };
+    setFormData(prev => ({
+      ...prev,
+      subtasks: [...(prev.subtasks || []), newSubtask]
+    }));
+    setNewSubtaskTitle('');
+  };
+
+  const removeSubtask = (subtaskId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      subtasks: (prev.subtasks || []).filter(s => s.id !== subtaskId)
+    }));
+  };
+
+  const toggleSubtaskEnabled = (enabled: boolean) => {
+    setHasSubtasks(enabled);
+    if (!enabled) {
+      setFormData(prev => ({ ...prev, subtasks: [] }));
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -192,6 +226,79 @@ const TaskModal: React.FC<TaskModalProps> = ({
              >
                  {Object.values(TaskStatus).map(s => <option key={s} value={s}>{s}</option>)}
              </select>
+          </div>
+
+          <div className="space-y-3 pt-2 border-t border-border-subtle">
+            <div className="flex items-center justify-between">
+              <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-2">
+                <ListChecks size={14}/> Lista de Tareas (Opcional)
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="checkbox"
+                  checked={hasSubtasks}
+                  onChange={(e) => toggleSubtaskEnabled(e.target.checked)}
+                  className="w-4 h-4 rounded border-border-subtle bg-surface-low text-neon focus:ring-neon"
+                />
+                <span className="text-xs text-mist-muted">Activar</span>
+              </label>
+            </div>
+
+            {hasSubtasks && (
+              <div className="space-y-3 animate-in slide-in-from-top-2 duration-200">
+                <div className="flex gap-2">
+                  <input 
+                    type="text"
+                    placeholder="Nueva subtarea..."
+                    value={newSubtaskTitle}
+                    onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addSubtask();
+                      }
+                    }}
+                    className="flex-1 bg-surface-low border border-border-subtle rounded p-2 text-mist text-sm focus:border-neon focus:outline-none"
+                  />
+                  <button 
+                    type="button"
+                    onClick={addSubtask}
+                    className="px-3 py-2 bg-neon/20 text-neon rounded border border-neon/30 hover:bg-neon/30 transition-all"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+
+                {(formData.subtasks || []).length > 0 && (
+                  <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
+                    {(formData.subtasks || []).map((subtask, index) => (
+                      <div 
+                        key={subtask.id}
+                        className="flex items-center justify-between gap-2 p-2 bg-surface-low/50 rounded border border-border-subtle group"
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <span className="text-xs text-mist-muted">{index + 1}.</span>
+                          <span className="text-sm text-mist truncate">{subtask.title}</span>
+                        </div>
+                        <button 
+                          type="button"
+                          onClick={() => removeSubtask(subtask.id)}
+                          className="p-1 text-mist-muted hover:text-neon-orange opacity-0 group-hover:opacity-100 transition-all"
+                        >
+                          <Minus size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {(formData.subtasks || []).length === 0 && (
+                  <p className="text-xs text-mist-faint text-center py-2 italic">
+                    Agrega elementos a la lista de tareas
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </form>
 

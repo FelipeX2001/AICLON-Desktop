@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
 import { User, Task, MeetingEvent, Demo, TaskStatus, TaskPriority } from '../types';
-import { Clock, Users, Plus, Edit2, Bot, X, Building2, Calendar, AlertTriangle, User as UserIcon } from 'lucide-react';
+import { Clock, Users, Plus, Edit2, Bot, X, Building2, Calendar, AlertTriangle, User as UserIcon, ListChecks } from 'lucide-react';
+import TaskViewModal from './TaskViewModal';
+import TaskModal from './TaskModal';
 
 interface DashboardHomeProps {
   user: User;
@@ -11,6 +13,8 @@ interface DashboardHomeProps {
   demos: Demo[];
   onSaveDemo: (demo: Demo) => void;
   onDeleteDemo: (demoId: string) => void;
+  onSaveTask: (task: Task) => void;
+  onDeleteTask: (taskId: string) => void;
 }
 
 const shortcuts = [
@@ -26,7 +30,7 @@ const shortcuts = [
   { id: '10', label: 'Gemini', iconType: 'ai', url: 'https://gemini.google.com', imageUrl: 'https://www.google.com/s2/favicons?domain=gemini.google.com&sz=128' },
 ];
 
-const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks = [], meetings = [], demos = [], onSaveDemo, onDeleteDemo }) => {
+const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks = [], meetings = [], demos = [], onSaveDemo, onDeleteDemo, onSaveTask, onDeleteTask }) => {
   const today = new Date().toISOString().split('T')[0];
   
   const myTasksToday = tasks.filter(t => 
@@ -48,6 +52,51 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
   const [isEditing, setIsEditing] = useState(false);
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const clients = React.useMemo(() => {
+    const clientNames = new Set<string>();
+    tasks.forEach(t => { if (t.clientName) clientNames.add(t.clientName); });
+    return Array.from(clientNames);
+  }, [tasks]);
+
+  const openViewModal = (task: Task) => {
+    setSelectedTask(task);
+    setIsViewModalOpen(true);
+  };
+
+  const openEditFromView = () => {
+    setIsViewModalOpen(false);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSubtaskToggle = (taskId: string, subtaskId: string, completed: boolean) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    const updatedSubtasks = (task.subtasks || []).map(s => 
+      s.id === subtaskId ? { ...s, completed } : s
+    );
+    
+    const updatedTask = { ...task, subtasks: updatedSubtasks };
+    onSaveTask(updatedTask);
+    setSelectedTask(updatedTask);
+  };
+
+  const handleSaveTask = (task: Task) => {
+    onSaveTask(task);
+    setIsEditModalOpen(false);
+    setIsViewModalOpen(false);
+    setSelectedTask(null);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    onDeleteTask(taskId);
+    setIsEditModalOpen(false);
+    setIsViewModalOpen(false);
+    setSelectedTask(null);
+  };
 
   const getPriorityColor = (p: TaskPriority) => {
     switch (p) {
@@ -111,16 +160,42 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
         <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-4">
             <h4 className="text-sm font-bold uppercase text-mist-muted tracking-wider mb-2 border-b border-border-subtle pb-2">Tareas para Hoy</h4>
-            {myTasksToday.length === 0 ? <p className="text-xs text-mist-faint italic">Todo al día.</p> : myTasksToday.map(task => (
-              <div 
-                key={task.id} 
-                onClick={() => setSelectedTask(task)}
-                className="p-4 rounded-lg bg-surface-low border border-border-subtle hover:border-neon/30 transition-colors cursor-pointer"
-              >
-                <div className="flex justify-between items-start mb-2"><span className="text-base font-medium text-mist truncate pr-2">{task.title}</span></div>
-                <div className="flex justify-between items-center"><p className="text-xs text-mist-muted font-semibold">{task.clientName}</p><span className="text-[10px] px-2 py-1 rounded bg-neon-blue/20 text-mist-muted whitespace-nowrap border border-neon-blue/20">{task.deadline}</span></div>
-              </div>
-            ))}
+            {myTasksToday.length === 0 ? <p className="text-xs text-mist-faint italic">Todo al día.</p> : myTasksToday.map(task => {
+              const subtasks = task.subtasks || [];
+              const completedSubtasks = subtasks.filter(s => s.completed).length;
+              const totalSubtasks = subtasks.length;
+              const progressPercent = totalSubtasks > 0 ? Math.round((completedSubtasks / totalSubtasks) * 100) : 0;
+              
+              return (
+                <div 
+                  key={task.id} 
+                  onClick={() => openViewModal(task)}
+                  className="p-4 rounded-lg bg-surface-low border border-border-subtle hover:border-neon/30 transition-colors cursor-pointer"
+                >
+                  <div className="flex justify-between items-start mb-2"><span className="text-base font-medium text-mist truncate pr-2">{task.title}</span></div>
+                  
+                  {totalSubtasks > 0 && (
+                    <div className="mb-2 space-y-1">
+                      <div className="flex items-center justify-between text-[10px] text-mist-muted">
+                        <span className="flex items-center gap-1">
+                          <ListChecks size={10} />
+                          {completedSubtasks}/{totalSubtasks}
+                        </span>
+                        <span>{progressPercent}%</span>
+                      </div>
+                      <div className="w-full bg-night rounded-full h-1.5 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-neon to-neon-blue transition-all duration-300"
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between items-center"><p className="text-xs text-mist-muted font-semibold">{task.clientName}</p><span className="text-[10px] px-2 py-1 rounded bg-neon-blue/20 text-mist-muted whitespace-nowrap border border-neon-blue/20">{task.deadline}</span></div>
+                </div>
+              );
+            })}
           </div>
           <div className="space-y-4 relative sm:border-l sm:border-border-subtle sm:pl-6">
             <h4 className="text-sm font-bold uppercase text-mist-muted tracking-wider mb-2 border-b border-border-subtle pb-2">Agenda Hoy</h4>
@@ -203,80 +278,31 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
       )}
 
       {selectedTask && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-night border border-border-subtle rounded-xl w-full max-w-lg shadow-depth overflow-hidden">
-            <div className="p-4 border-b border-border-subtle flex justify-between items-center bg-surface-low">
-              <h3 className="text-lg font-designer text-mist uppercase tracking-wide">Detalle de Tarea</h3>
-              <button onClick={() => setSelectedTask(null)} className="text-mist-muted hover:text-mist"><X size={20} /></button>
-            </div>
-            
-            {selectedTask.coverUrl && (
-              <div className="h-40 w-full relative">
-                <img src={selectedTask.coverUrl} alt="Cover" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-night via-transparent to-transparent" />
-              </div>
-            )}
-            
-            <div className="p-6 space-y-5">
-              <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl font-bold text-mist leading-tight">{selectedTask.title}</h2>
-                <span className={`text-xs uppercase font-bold px-3 py-1 rounded border whitespace-nowrap ${getPriorityColor(selectedTask.priority)}`}>
-                  {selectedTask.priority}
-                </span>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-surface-low rounded-lg p-3 border border-border-subtle">
-                  <p className="text-[10px] uppercase font-bold text-mist-muted mb-1 flex items-center"><Building2 size={12} className="mr-1" /> Cliente</p>
-                  <p className="text-sm text-mist font-medium">{selectedTask.clientName}</p>
-                </div>
-                <div className="bg-surface-low rounded-lg p-3 border border-border-subtle">
-                  <p className="text-[10px] uppercase font-bold text-mist-muted mb-1 flex items-center"><Calendar size={12} className="mr-1" /> Fecha Límite</p>
-                  <p className="text-sm text-mist font-mono">{selectedTask.deadline}</p>
-                </div>
-                <div className="bg-surface-low rounded-lg p-3 border border-border-subtle">
-                  <p className="text-[10px] uppercase font-bold text-mist-muted mb-1 flex items-center"><AlertTriangle size={12} className="mr-1" /> Estado</p>
-                  <p className="text-sm text-neon font-medium">{selectedTask.status}</p>
-                </div>
-                <div className="bg-surface-low rounded-lg p-3 border border-border-subtle">
-                  <p className="text-[10px] uppercase font-bold text-mist-muted mb-1 flex items-center"><UserIcon size={12} className="mr-1" /> Encargado</p>
-                  <div className="flex items-center">
-                    {(() => {
-                      const assignee = users.find(u => u.id === selectedTask.assigneeId);
-                      return assignee ? (
-                        <>
-                          <img src={assignee.avatarUrl} alt={assignee.name} className="w-5 h-5 rounded-full border border-border-subtle object-cover mr-2" />
-                          <span className="text-sm text-mist">{assignee.name}</span>
-                        </>
-                      ) : <span className="text-sm text-mist-muted">Sin asignar</span>;
-                    })()}
-                  </div>
-                </div>
-              </div>
-
-              {selectedTask.description && (
-                <div className="bg-surface-low rounded-lg p-4 border border-border-subtle">
-                  <p className="text-[10px] uppercase font-bold text-mist-muted mb-2">Descripción</p>
-                  <p className="text-sm text-mist whitespace-pre-wrap">{selectedTask.description}</p>
-                </div>
-              )}
-
-              {selectedTask.comments && (
-                <div className="bg-surface-low rounded-lg p-4 border border-neon-orange/30">
-                  <p className="text-[10px] uppercase font-bold text-neon-orange mb-2">Comentarios</p>
-                  <p className="text-sm text-mist whitespace-pre-wrap">{selectedTask.comments}</p>
-                </div>
-              )}
-
-              <div className="pt-2 flex justify-end">
-                <button onClick={() => setSelectedTask(null)} className="px-6 py-2 rounded bg-gradient-primary text-mist text-sm font-bold shadow-neon-glow hover:brightness-110 transition-all">
-                  Cerrar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <TaskViewModal 
+          isOpen={isViewModalOpen}
+          onClose={() => {
+            setIsViewModalOpen(false);
+            setSelectedTask(null);
+          }}
+          task={selectedTask}
+          users={users}
+          onEdit={openEditFromView}
+          onSubtaskToggle={handleSubtaskToggle}
+        />
       )}
+
+      <TaskModal 
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedTask(null);
+        }}
+        onSave={handleSaveTask}
+        onDelete={handleDeleteTask}
+        taskToEdit={selectedTask}
+        users={users}
+        clients={clients}
+      />
     </div>
   );
 };
