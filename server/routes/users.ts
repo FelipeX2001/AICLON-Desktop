@@ -37,8 +37,9 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, email, role, avatarUrl } = req.body;
-    const hashedPassword = await bcrypt.hash('defaultPassword123', 10);
+    const { name, email, role, avatarUrl, tempPassword } = req.body;
+    const passwordToHash = tempPassword || 'temp1234';
+    const hashedPassword = await bcrypt.hash(passwordToHash, 10);
     
     const [newUser] = await db.insert(users).values({
       name,
