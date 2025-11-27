@@ -111,6 +111,15 @@ Deployment configured with autoscale:
 - Backend runs compiled JavaScript (no ts-node overhead) for faster startup
 
 ## Recent Changes (Nov 27, 2025)
+- **Full-page User Profile View (UserProfilePage.tsx)**: Complete profile page with three functional tabs
+  - Header with cover image, avatar, user info, and role badge
+  - Tasks Tab: Full Kanban board filtered by user with drag-and-drop, auto-assigns user when creating new tasks
+  - Meetings Tab: Calendar view filtered by user with monthly navigation, auto-assigns user when creating new meetings
+  - Clients Tab: Detailed client cards with images filtered by assignedUserId
+  - TeamView: Clicking a user navigates to full-page profile instead of modal
+  - Profile Dropdown Menu: Added "Ver mis Tareas" and "Ver mis Reuniones" quick navigation buttons
+  - App.tsx: New state management for profileViewUser and profileViewTab
+- **OG Meta Tags**: Added Open Graph image and favicon for better branding
 - **Optional subtasks feature**: Tasks can now have optional subtask lists with progress tracking
   - Added `subtasks` jsonb field to tasks table in schema
   - Created `Subtask` interface with id, title, completed fields
