@@ -14,6 +14,8 @@ import TaskBoard from './components/TaskBoard';
 import MeetingsView from './components/MeetingsView';
 import BotVersionsView from './components/BotVersionsView';
 import TutorialsView from './components/TutorialsView';
+import TutorialPage from './components/TutorialPage';
+import TutorialEditPage from './components/TutorialEditPage';
 import UserEditModal from './components/UserEditModal';
 import UserProfilePage from './components/UserProfilePage';
 import { User, Task, MeetingEvent, ActiveClient, Lead, Notification, BotVersion, Tutorial, Demo, DroppedClient } from './types';
@@ -60,6 +62,9 @@ const App: React.FC = () => {
 
   const [profileViewUser, setProfileViewUser] = useState<User | null>(null);
   const [profileViewTab, setProfileViewTab] = useState<'tasks' | 'meetings' | 'clients'>('tasks');
+
+  const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null);
+  const [isEditingTutorial, setIsEditingTutorial] = useState(false);
 
   const loadAllData = useCallback(async () => {
     try {
@@ -642,13 +647,18 @@ const App: React.FC = () => {
           description: tutorial.description,
           link: tutorial.link,
           media: tutorial.media,
+          steps: tutorial.steps,
           coverUrl: tutorial.coverUrl,
           coverPosition: tutorial.coverPosition
         });
-        setTutorials(prev => prev.map(t => t.id === tutorial.id ? {
+        const updatedTutorial = {
           ...updated,
           id: String(updated.id)
-        } : t));
+        };
+        setTutorials(prev => prev.map(t => t.id === tutorial.id ? updatedTutorial : t));
+        if (selectedTutorial?.id === tutorial.id) {
+          setSelectedTutorial(updatedTutorial);
+        }
       } else {
         const created = await tutorialsAPI.create({
           title: tutorial.title,
@@ -656,6 +666,7 @@ const App: React.FC = () => {
           description: tutorial.description,
           link: tutorial.link,
           media: tutorial.media,
+          steps: tutorial.steps,
           coverUrl: tutorial.coverUrl,
           coverPosition: tutorial.coverPosition
         });
@@ -954,11 +965,37 @@ const App: React.FC = () => {
           />
         );
       case 'tutorials':
+        if (selectedTutorial && isEditingTutorial) {
+          return (
+            <TutorialEditPage
+              tutorial={selectedTutorial}
+              currentUser={currentUser || undefined}
+              onBack={() => {
+                setIsEditingTutorial(false);
+                setSelectedTutorial(null);
+              }}
+              onSave={handleSaveTutorial}
+              onDelete={handleDeleteTutorial}
+            />
+          );
+        }
+        if (selectedTutorial) {
+          return (
+            <TutorialPage
+              tutorial={selectedTutorial}
+              currentUser={currentUser || undefined}
+              onBack={() => setSelectedTutorial(null)}
+              onEdit={() => setIsEditingTutorial(true)}
+            />
+          );
+        }
         return (
           <TutorialsView 
             tutorials={validTutorials}
+            currentUser={currentUser || undefined}
             onSaveTutorial={handleSaveTutorial}
             onDeleteTutorial={handleDeleteTutorial}
+            onViewTutorial={(tutorial) => setSelectedTutorial(tutorial)}
           />
         );
       case 'forgot-password':

@@ -1,38 +1,32 @@
-
 import React, { useState } from 'react';
-import { Tutorial } from '../types';
-import { Plus, Calendar, Image as ImageIcon, Video, ExternalLink } from 'lucide-react';
+import { Tutorial, User } from '../types';
+import { Plus, Calendar, Image as ImageIcon, Video, ExternalLink, BookOpen } from 'lucide-react';
 import TutorialModal from './TutorialModal';
 
 interface TutorialsViewProps {
   tutorials: Tutorial[];
+  currentUser?: User;
   onSaveTutorial: (tutorial: Tutorial) => void;
   onDeleteTutorial: (tutorialId: string) => void;
+  onViewTutorial: (tutorial: Tutorial) => void;
 }
 
-const TutorialsView: React.FC<TutorialsViewProps> = ({ tutorials, onSaveTutorial, onDeleteTutorial }) => {
+const TutorialsView: React.FC<TutorialsViewProps> = ({ 
+  tutorials, 
+  currentUser,
+  onSaveTutorial, 
+  onDeleteTutorial,
+  onViewTutorial 
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tutorialToEdit, setTutorialToEdit] = useState<Tutorial | null>(null);
+  const isAdmin = currentUser?.role === 'admin';
 
   const handleSave = (tutorial: Tutorial) => {
     onSaveTutorial(tutorial);
     setIsModalOpen(false);
-    setTutorialToEdit(null);
-  };
-
-  const handleDelete = (id: string) => {
-    onDeleteTutorial(id);
-    setIsModalOpen(false);
-    setTutorialToEdit(null);
   };
 
   const openNewModal = () => {
-    setTutorialToEdit(null);
-    setIsModalOpen(true);
-  };
-
-  const openEditModal = (tutorial: Tutorial) => {
-    setTutorialToEdit(tutorial);
     setIsModalOpen(true);
   };
 
@@ -40,14 +34,16 @@ const TutorialsView: React.FC<TutorialsViewProps> = ({ tutorials, onSaveTutorial
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex justify-end items-center mb-6">
-        <button 
-          onClick={openNewModal}
-          className="px-6 py-2.5 rounded-lg bg-gradient-primary text-mist font-bold shadow-neon-glow hover:brightness-110 transition-all flex items-center"
-        >
-          <Plus size={18} className="mr-2" /> Nuevo Tutorial
-        </button>
-      </div>
+      {isAdmin && (
+        <div className="flex justify-end items-center mb-6">
+          <button 
+            onClick={openNewModal}
+            className="px-6 py-2.5 rounded-lg bg-gradient-primary text-mist font-bold shadow-neon-glow hover:brightness-110 transition-all flex items-center"
+          >
+            <Plus size={18} className="mr-2" /> Nuevo Tutorial
+          </button>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto custom-scrollbar pb-4">
         {validTutorials.length === 0 ? (
@@ -61,10 +57,10 @@ const TutorialsView: React.FC<TutorialsViewProps> = ({ tutorials, onSaveTutorial
               .map(tutorial => (
                 <div 
                   key={tutorial.id}
-                  onClick={() => openEditModal(tutorial)}
+                  onClick={() => onViewTutorial(tutorial)}
                   className="bg-surface-low border border-border-subtle rounded-xl overflow-hidden hover:border-neon/50 hover:shadow-card-glow transition-all cursor-pointer group flex flex-col h-full"
                 >
-                  {tutorial.coverUrl && (
+                  {tutorial.coverUrl ? (
                     <div className="w-full h-48 relative overflow-hidden border-b border-border-subtle">
                       <img 
                         src={tutorial.coverUrl} 
@@ -72,6 +68,10 @@ const TutorialsView: React.FC<TutorialsViewProps> = ({ tutorials, onSaveTutorial
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-surface-low to-transparent opacity-60" />
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 relative overflow-hidden border-b border-border-subtle bg-gradient-to-br from-surface-med to-night flex items-center justify-center">
+                      <BookOpen size={48} className="text-mist-faint" />
                     </div>
                   )}
 
@@ -82,6 +82,14 @@ const TutorialsView: React.FC<TutorialsViewProps> = ({ tutorials, onSaveTutorial
                     <p className="text-sm text-mist-muted line-clamp-3 mb-4">
                       {tutorial.description}
                     </p>
+                    
+                    {tutorial.steps && tutorial.steps.length > 0 && (
+                      <div className="flex items-center text-xs text-neon">
+                        <span className="px-2 py-0.5 rounded-full bg-neon/10 border border-neon/20">
+                          {tutorial.steps.length} pasos
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-4 bg-surface-med/50 border-t border-border-subtle flex justify-between items-center">
@@ -105,10 +113,10 @@ const TutorialsView: React.FC<TutorialsViewProps> = ({ tutorials, onSaveTutorial
       <TutorialModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        tutorialToEdit={tutorialToEdit}
+        tutorialToEdit={null}
         onSave={handleSave}
-        onDelete={handleDelete}
-        isAdmin={true} 
+        onDelete={onDeleteTutorial}
+        isAdmin={isAdmin} 
       />
     </div>
   );
