@@ -100,6 +100,10 @@ Deployment configured with autoscale:
 - **Component refactoring**: TaskBoard, MeetingsView, LeadBoard, ActiveClientsBoard, BotVersionsView, TutorialsView, DashboardHome all use props + callbacks
 - **New API endpoints**: dropped_clients, demos tables and routes added
 - **Real-time updates**: All CRUD operations go through centralized state in App.tsx
+- **Bot versions naming**: Updated from "chatwoot" to "chatbot" across schema, types, and UI
+- **Board UI improvements**: TaskBoard and ActiveClientsBoard now use fixed-width columns (w-80) with horizontal scroll for better mobile experience
+- **Task detail modal**: DashboardHome now shows full task details when clicking on task cards
+- **Profile photo fix**: UserEditModal correctly passes avatarUrl to ImageUploadField
 - Only localStorage usage remaining: theme preference (aiclon_theme)
 
 ## Previous Changes (Nov 26, 2025)
