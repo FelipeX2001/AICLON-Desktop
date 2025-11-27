@@ -36,6 +36,11 @@ export const tasks = pgTable('tasks', {
   priority: taskPriorityEnum('priority').notNull().default('Media'),
   deadline: varchar('deadline', { length: 50 }),
   comments: text('comments'),
+  subtasks: jsonb('subtasks').$type<Array<{
+    id: string;
+    title: string;
+    completed: boolean;
+  }>>(),
   completedAt: timestamp('completed_at'),
   isDeleted: boolean('is_deleted').default(false),
   deletedAt: timestamp('deleted_at'),

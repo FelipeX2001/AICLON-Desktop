@@ -54,6 +54,12 @@ export enum TaskPriority {
   Low = 'Baja'
 }
 
+export interface Subtask {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
 export interface Task extends BaseEntity {
   id: string;
   title: string;
@@ -64,6 +70,7 @@ export interface Task extends BaseEntity {
   priority: TaskPriority;
   deadline: string; // YYYY-MM-DD
   comments?: string;
+  subtasks?: Subtask[]; // Optional checklist items with progress
   completedAt?: string; // New Field for archiving logic
 }
 
