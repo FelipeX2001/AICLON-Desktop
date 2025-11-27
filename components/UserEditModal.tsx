@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { User } from '../types';
-import { X, Save, Shield, User as UserIcon, Mail, Trash2, AlertTriangle, Lock } from 'lucide-react';
+import { X, Save, Shield, User as UserIcon, Mail, Trash2, AlertTriangle, Lock, ImageIcon } from 'lucide-react';
 import ImageUploadField from './ImageUploadField';
 
 interface UserEditModalProps {
@@ -58,6 +58,29 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           
+          {/* Banner Upload */}
+          <div className="space-y-2">
+            <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-2"><ImageIcon size={14} /> Banner de Perfil</label>
+            <div className="relative h-24 rounded-lg overflow-hidden border border-border-subtle">
+              {formData.coverUrl ? (
+                <img 
+                  src={formData.coverUrl} 
+                  alt="Banner" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-neon/20 via-neon-blue/20 to-night flex items-center justify-center">
+                  <span className="text-xs text-mist-muted">Sin banner</span>
+                </div>
+              )}
+            </div>
+            <ImageUploadField 
+              label="Cambiar Banner"
+              value={formData.coverUrl || ''} 
+              onChange={(url) => setFormData({...formData, coverUrl: url})}
+            />
+          </div>
+
           {/* Avatar Upload */}
           <div className="flex flex-col items-center space-y-3">
              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-neon/50 shadow-[0_0_15px_rgba(0,200,255,0.3)] relative">
@@ -69,7 +92,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
              </div>
              <div className="w-full">
                  <ImageUploadField 
-                    label="Cambiar Foto"
+                    label="Cambiar Foto de Perfil"
                     value={formData.avatarUrl || ''} 
                     onChange={(url) => setFormData({...formData, avatarUrl: url})}
                     className="text-center"

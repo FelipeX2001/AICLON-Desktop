@@ -46,8 +46,22 @@ const TeamView: React.FC<TeamViewProps> = ({
             <div 
               key={user.id} 
               onClick={() => onViewUserProfile(user)}
-              className="relative group bg-surface-low border border-border-subtle rounded-2xl p-8 hover:bg-surface-med hover:border-neon/30 transition-all duration-300 shadow-lg hover:shadow-neon-glow/20 cursor-pointer flex flex-col items-center text-center"
+              className="relative group bg-surface-low border border-border-subtle rounded-2xl overflow-hidden hover:border-neon/30 transition-all duration-300 shadow-lg hover:shadow-neon-glow/20 cursor-pointer flex flex-col items-center text-center"
             >
+              {/* Banner Background */}
+              <div className="w-full h-28 relative">
+                {user.coverUrl ? (
+                  <img 
+                    src={user.coverUrl} 
+                    alt="Banner" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-neon/20 via-neon-blue/20 to-night" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-low via-transparent to-transparent" />
+              </div>
+
               {/* Role Badge */}
               <div className={`absolute top-4 right-4 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider border ${
                 user.role === 'admin' 
@@ -57,11 +71,12 @@ const TeamView: React.FC<TeamViewProps> = ({
                 {user.role}
               </div>
 
-              <div className="relative mb-6">
+              {/* Avatar overlapping banner */}
+              <div className="relative -mt-16 mb-4 z-10">
                 <img 
                   src={user.avatarUrl} 
                   alt={user.name} 
-                  className="w-40 h-40 rounded-full object-cover border-4 border-surface-low shadow-[0_0_20px_rgba(0,0,0,0.5)] group-hover:border-neon/50 group-hover:scale-105 transition-all duration-500"
+                  className="w-28 h-28 rounded-full object-cover border-4 border-surface-low shadow-[0_0_20px_rgba(0,0,0,0.5)] group-hover:border-neon/50 group-hover:scale-105 transition-all duration-500"
                 />
                 {user.role === 'admin' && (
                   <div className="absolute bottom-1 right-1 bg-night rounded-full p-2 border border-border-subtle shadow-sm">
@@ -70,13 +85,15 @@ const TeamView: React.FC<TeamViewProps> = ({
                 )}
               </div>
 
-              <h3 className="text-xl font-bold text-mist group-hover:text-white transition-colors mb-1">
-                {user.name} {isMe && <span className="text-mist-muted text-xs font-normal ml-1">(Tú)</span>}
-              </h3>
-              
-              <div className="flex items-center text-mist-muted text-sm">
-                <Mail size={12} className="mr-1.5" />
-                {user.email}
+              <div className="px-6 pb-6">
+                <h3 className="text-xl font-bold text-mist group-hover:text-white transition-colors mb-1">
+                  {user.name} {isMe && <span className="text-mist-muted text-xs font-normal ml-1">(Tú)</span>}
+                </h3>
+                
+                <div className="flex items-center justify-center text-mist-muted text-sm">
+                  <Mail size={12} className="mr-1.5" />
+                  {user.email}
+                </div>
               </div>
             </div>
           );
