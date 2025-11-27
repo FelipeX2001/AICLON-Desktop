@@ -60,10 +60,19 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, role, avatarUrl, isActive } = req.body;
+    const { name, email, role, avatarUrl, isActive, coverUrl, coverPosition } = req.body;
     
     const [updatedUser] = await db.update(users)
-      .set({ name, email, role, avatarUrl, isActive, updatedAt: new Date() })
+      .set({ 
+        name, 
+        email, 
+        role, 
+        avatarUrl, 
+        isActive, 
+        coverUrl,
+        coverPosition,
+        updatedAt: new Date() 
+      })
       .where(eq(users.id, Number(id)))
       .returning();
     
