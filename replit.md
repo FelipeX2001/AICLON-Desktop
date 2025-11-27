@@ -95,6 +95,13 @@ Deployment configured with autoscale:
 - Backend runs compiled JavaScript (no ts-node overhead) for faster startup
 
 ## Recent Changes (Nov 27, 2025)
+- **Optional subtasks feature**: Tasks can now have optional subtask lists with progress tracking
+  - Added `subtasks` jsonb field to tasks table in schema
+  - Created `Subtask` interface with id, title, completed fields
+  - TaskViewModal: New read-only modal to view task details with functional subtask checkboxes
+  - TaskModal: Refactored to edit-only mode with subtask management (add/remove items, toggle feature)
+  - Progress bar: Shows completion percentage on task cards when subtasks exist
+  - Modal flow: Click task → TaskViewModal (view) → Edit button → TaskModal (edit with delete)
 - **Complete localStorage elimination**: All data now persists through PostgreSQL API
 - **Lifted state pattern**: App.tsx is now single source of truth for all application state
 - **Component refactoring**: TaskBoard, MeetingsView, LeadBoard, ActiveClientsBoard, BotVersionsView, TutorialsView, DashboardHome all use props + callbacks
