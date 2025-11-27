@@ -120,21 +120,23 @@ const BotVersionsView: React.FC<BotVersionsViewProps> = ({
             
             <div className="flex items-center space-x-2">
               {isAdmin && (
-                <button 
-                  onClick={() => openCoverEdit(type)}
-                  className={`p-1.5 rounded transition-all opacity-0 group-hover/header:opacity-100 ${coverUrl ? 'bg-black/60 text-white hover:bg-neon/20' : 'bg-black/40 text-mist-muted hover:text-white'}`}
-                  title="Cambiar Portada"
-                >
-                  <Edit size={14} />
-                </button>
-              )}
+                <>
+                  <button 
+                    onClick={() => openCoverEdit(type)}
+                    className={`p-1.5 rounded transition-all opacity-0 group-hover/header:opacity-100 ${coverUrl ? 'bg-black/60 text-white hover:bg-neon/20' : 'bg-black/40 text-mist-muted hover:text-white'}`}
+                    title="Cambiar Portada"
+                  >
+                    <Edit size={14} />
+                  </button>
 
-              <button 
-                onClick={() => openNewModal(type)}
-                className="text-xs font-bold text-mist bg-gradient-primary px-3 py-1.5 rounded shadow-neon-glow hover:brightness-110 transition-all flex items-center"
-              >
-                <Plus size={14} className="mr-1" /> Nueva
-              </button>
+                  <button 
+                    onClick={() => openNewModal(type)}
+                    className="text-xs font-bold text-mist bg-gradient-primary px-3 py-1.5 rounded shadow-neon-glow hover:brightness-110 transition-all flex items-center"
+                  >
+                    <Plus size={14} className="mr-1" /> Nueva
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -181,6 +183,7 @@ const BotVersionsView: React.FC<BotVersionsViewProps> = ({
           isOpen={isViewModalOpen}
           onClose={() => { setIsViewModalOpen(false); setVersionToView(null); }}
           botVersion={versionToView}
+          currentUser={user}
           onEdit={handleEditFromView}
         />
       )}

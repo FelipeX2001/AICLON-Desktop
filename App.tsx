@@ -909,6 +909,7 @@ const App: React.FC = () => {
         return (
           <ClientsDashboard 
             users={validUsers}
+            currentUser={currentUser || undefined}
             activeClients={validActiveClients}
             leads={validLeads}
             droppedClients={droppedClients}

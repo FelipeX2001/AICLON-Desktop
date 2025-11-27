@@ -1,19 +1,22 @@
 
 import React from 'react';
-import { DroppedClient } from '../types';
+import { DroppedClient, User } from '../types';
 import { RefreshCw, Trash2, Calendar } from 'lucide-react';
 
 interface DroppedClientsViewProps {
   droppedClients: DroppedClient[];
+  currentUser?: User;
   onRecover: (client: DroppedClient) => void;
   onDelete: (id: string) => void;
 }
 
 const DroppedClientsView: React.FC<DroppedClientsViewProps> = ({
   droppedClients,
+  currentUser,
   onRecover,
   onDelete
 }) => {
+  const isAdmin = currentUser?.role === 'admin';
   return (
     <div className="bg-night/50 rounded-xl border border-border-subtle overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
       <div className="p-6 border-b border-border-subtle bg-surface-low/30 flex justify-between items-center">
@@ -64,20 +67,24 @@ const DroppedClientsView: React.FC<DroppedClientsViewProps> = ({
                             </div>
                         </td>
                         <td className="p-4">
-                            <div className="flex items-center justify-center gap-2">
-                              <button 
-                                  onClick={() => onRecover(client)}
-                                  className="text-xs font-bold text-neon hover:bg-neon/10 border border-neon/30 px-3 py-1.5 rounded-lg transition-colors flex items-center"
-                              >
-                                  <RefreshCw size={12} className="mr-1.5" /> Recuperar
-                              </button>
-                              <button 
-                                  onClick={() => onDelete(client.id)}
-                                  className="text-xs font-bold text-red-400 hover:bg-red-500/10 border border-red-500/30 px-2 py-1.5 rounded-lg transition-colors"
-                              >
-                                  <Trash2 size={12} />
-                              </button>
-                            </div>
+                            {isAdmin ? (
+                              <div className="flex items-center justify-center gap-2">
+                                <button 
+                                    onClick={() => onRecover(client)}
+                                    className="text-xs font-bold text-neon hover:bg-neon/10 border border-neon/30 px-3 py-1.5 rounded-lg transition-colors flex items-center"
+                                >
+                                    <RefreshCw size={12} className="mr-1.5" /> Recuperar
+                                </button>
+                                <button 
+                                    onClick={() => onDelete(client.id)}
+                                    className="text-xs font-bold text-red-400 hover:bg-red-500/10 border border-red-500/30 px-2 py-1.5 rounded-lg transition-colors"
+                                >
+                                    <Trash2 size={12} />
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-mist-faint italic">Solo lectura</span>
+                            )}
                         </td>
                     </tr>
                 ))

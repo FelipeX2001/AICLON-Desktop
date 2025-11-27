@@ -111,6 +111,22 @@ Deployment configured with autoscale:
 - Backend runs compiled JavaScript (no ts-node overhead) for faster startup
 
 ## Recent Changes (Nov 27, 2025)
+- **Role-Based Permissions System**: Comprehensive access control for admin vs developer roles
+  - Admin (role='admin'): Full access to all features - create, edit, delete everything
+  - Developer (role='developer'): Limited access - can only create/edit/delete Tasks & Meetings
+  - Restricted components for developers (view-only):
+    - LeadBoard: No create/edit buttons, no drag-drop
+    - LeadViewModal: No edit button
+    - ActiveClientsBoard: No drag-drop between stages, no payment toggle
+    - ActiveClientViewModal: No edit button
+    - BotVersionsView: No create/edit cover buttons
+    - BotVersionViewModal: No edit button
+    - TutorialsView/TutorialPage: No create/edit buttons
+    - DashboardHome: No demo create/edit buttons
+    - DroppedClientsView: No recover/delete buttons
+    - ClientsDashboard: All view modals respect permissions
+  - Implementation: `const isAdmin = currentUser?.role === 'admin'` check in each component
+  - Pattern: ViewModals receive `currentUser` prop to conditionally render edit buttons
 - **Full-page Tutorial System**: Tutoriales ahora son páginas completas en lugar de modales
   - TutorialPage.tsx: Página de visualización con banner, título, descripción, links, pasos y media
   - TutorialEditPage.tsx: Página de edición completa solo para admins

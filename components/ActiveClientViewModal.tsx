@@ -7,6 +7,7 @@ interface ActiveClientViewModalProps {
   onClose: () => void;
   client: ActiveClient;
   users: User[];
+  currentUser?: User;
   onEdit: () => void;
 }
 
@@ -15,8 +16,10 @@ const ActiveClientViewModal: React.FC<ActiveClientViewModalProps> = ({
   onClose, 
   client, 
   users,
+  currentUser,
   onEdit
 }) => {
+  const isAdmin = currentUser?.role === 'admin';
   if (!isOpen || !client) return null;
 
   const assignee = users.find(u => u.id === client.assignedUserId);
@@ -207,14 +210,16 @@ const ActiveClientViewModal: React.FC<ActiveClientViewModalProps> = ({
           )}
         </div>
 
-        <div className="p-4 border-t border-border-subtle bg-surface-low flex justify-end items-center">
-          <button 
-            onClick={onEdit}
-            className="px-6 py-2 rounded bg-gradient-primary text-mist text-sm font-bold shadow-neon-glow hover:brightness-110 flex items-center"
-          >
-            <Edit size={16} className="mr-2"/> Editar
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="p-4 border-t border-border-subtle bg-surface-low flex justify-end items-center">
+            <button 
+              onClick={onEdit}
+              className="px-6 py-2 rounded bg-gradient-primary text-mist text-sm font-bold shadow-neon-glow hover:brightness-110 flex items-center"
+            >
+              <Edit size={16} className="mr-2"/> Editar
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

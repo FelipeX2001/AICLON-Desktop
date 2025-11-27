@@ -179,14 +179,16 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex justify-end items-center mb-6 px-1">
-        <button 
-          onClick={openCreateModal}
-          className="px-6 py-2.5 rounded-lg bg-gradient-primary text-mist font-bold shadow-neon-glow hover:brightness-110 transition-all flex items-center"
-        >
-          <Plus size={18} className="mr-2" /> Crear Lead
-        </button>
-      </div>
+      {isAdmin && (
+        <div className="flex justify-end items-center mb-6 px-1">
+          <button 
+            onClick={openCreateModal}
+            className="px-6 py-2.5 rounded-lg bg-gradient-primary text-mist font-bold shadow-neon-glow hover:brightness-110 transition-all flex items-center"
+          >
+            <Plus size={18} className="mr-2" /> Crear Lead
+          </button>
+        </div>
+      )}
 
       <div 
         ref={scrollContainerRef}
@@ -204,8 +206,8 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
               <div 
                 key={stage}
                 className="w-80 flex flex-col bg-surface-low/50 border border-border-subtle rounded-xl overflow-hidden"
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, stage)}
+                onDragOver={isAdmin ? handleDragOver : undefined}
+                onDrop={isAdmin ? (e) => handleDrop(e, stage) : undefined}
               >
                 <div className="p-3 bg-surface-med border-b border-border-subtle flex justify-between items-center sticky top-0 z-10">
                   <span className="font-bold text-sm text-mist uppercase tracking-wide truncate" title={stage}>
@@ -220,8 +222,8 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
                   {stageLeads.map((lead) => (
                     <div
                       key={lead.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, lead.id)}
+                      draggable={isAdmin}
+                      onDragStart={isAdmin ? (e) => handleDragStart(e, lead.id) : undefined}
                       onClick={() => openViewModal(lead)}
                       className="lead-card bg-night border border-border-subtle rounded-lg hover:border-neon/50 hover:shadow-card-glow transition-all cursor-pointer group relative flex flex-col overflow-hidden p-4"
                     >
@@ -232,9 +234,11 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
                         </div>
                       )}
 
-                      <div className="absolute top-2 right-2 text-mist-muted/20 group-hover:text-mist-muted cursor-grab z-10">
-                        <GripVertical size={14} />
-                      </div>
+                      {isAdmin && (
+                        <div className="absolute top-2 right-2 text-mist-muted/20 group-hover:text-mist-muted cursor-grab z-10">
+                          <GripVertical size={14} />
+                        </div>
+                      )}
                       <h4 className="font-montserrat font-bold text-mist text-base pr-4 mb-2 truncate relative z-10">
                         {lead.nombre_empresa || 'Cliente Sin Nombre'}
                       </h4>
@@ -261,7 +265,7 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
                         </div>
                       </div>
 
-                      {stage === 'Lead Cerrado' && (
+                      {isAdmin && stage === 'Lead Cerrado' && (
                         <button
                           onClick={(e) => openConversionModal(e, lead)}
                           className="mt-3 w-full py-1.5 rounded bg-neon/10 border border-neon/30 text-neon text-xs font-bold uppercase hover:bg-neon hover:text-night transition-all flex items-center justify-center"
@@ -374,6 +378,7 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
           onClose={() => { setIsViewModalOpen(false); setViewingLead(null); }}
           lead={viewingLead}
           users={users || []}
+          currentUser={user}
           onEdit={handleEditFromView}
         />
       )}

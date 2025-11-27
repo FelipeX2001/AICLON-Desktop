@@ -7,6 +7,7 @@ interface LeadViewModalProps {
   onClose: () => void;
   lead: Lead;
   users: User[];
+  currentUser?: User;
   onEdit: () => void;
 }
 
@@ -15,8 +16,10 @@ const LeadViewModal: React.FC<LeadViewModalProps> = ({
   onClose, 
   lead, 
   users,
+  currentUser,
   onEdit
 }) => {
+  const isAdmin = currentUser?.role === 'admin';
   if (!isOpen || !lead) return null;
 
   const assignee = users.find(u => u.id === lead.assignedUserId);
@@ -270,14 +273,16 @@ const LeadViewModal: React.FC<LeadViewModalProps> = ({
           )}
         </div>
 
-        <div className="p-4 border-t border-border-subtle bg-surface-low flex justify-end items-center">
-          <button 
-            onClick={onEdit}
-            className="px-6 py-2 rounded bg-gradient-primary text-mist text-sm font-bold shadow-neon-glow hover:brightness-110 flex items-center"
-          >
-            <Edit size={16} className="mr-2"/> Editar
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="p-4 border-t border-border-subtle bg-surface-low flex justify-end items-center">
+            <button 
+              onClick={onEdit}
+              className="px-6 py-2 rounded bg-gradient-primary text-mist text-sm font-bold shadow-neon-glow hover:brightness-110 flex items-center"
+            >
+              <Edit size={16} className="mr-2"/> Editar
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

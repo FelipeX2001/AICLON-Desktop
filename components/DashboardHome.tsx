@@ -139,6 +139,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
   };
 
   const validDemos = demos.filter(d => !d.isDeleted);
+  const isAdmin = user?.role === 'admin';
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
@@ -231,11 +232,13 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
       <div className="lg:col-span-2 bg-surface-low border border-border-subtle rounded-2xl overflow-hidden shadow-depth">
         <div className="p-6 border-b border-border-subtle flex justify-between items-center bg-night/30">
           <h3 className="text-3xl font-designer text-mist pt-1">Demos Activas</h3>
-          <button onClick={handleOpenNewDemo} className="text-xs font-bold text-neon-orange border border-neon-orange/30 px-4 py-2 rounded hover:bg-neon-orange/10 transition-colors uppercase tracking-wide flex items-center"><Plus size={16} className="mr-1" /> Nueva Demo</button>
+          {isAdmin && (
+            <button onClick={handleOpenNewDemo} className="text-xs font-bold text-neon-orange border border-neon-orange/30 px-4 py-2 rounded hover:bg-neon-orange/10 transition-colors uppercase tracking-wide flex items-center"><Plus size={16} className="mr-1" /> Nueva Demo</button>
+          )}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead><tr className="border-b border-border-subtle bg-night/50"><th className="p-4 text-xs font-semibold text-mist-muted uppercase">Demo</th><th className="p-4 text-xs font-semibold text-mist-muted uppercase">Nombre</th><th className="p-4 text-xs font-semibold text-mist-muted uppercase">Cliente</th><th className="p-4 text-xs font-semibold text-mist-muted uppercase">URL</th><th className="p-4 text-center">Editar</th></tr></thead>
+            <thead><tr className="border-b border-border-subtle bg-night/50"><th className="p-4 text-xs font-semibold text-mist-muted uppercase">Demo</th><th className="p-4 text-xs font-semibold text-mist-muted uppercase">Nombre</th><th className="p-4 text-xs font-semibold text-mist-muted uppercase">Cliente</th><th className="p-4 text-xs font-semibold text-mist-muted uppercase">URL</th>{isAdmin && <th className="p-4 text-center">Editar</th>}</tr></thead>
             <tbody className="divide-y divide-border-subtle">
               {validDemos.map((demo) => (
                 <tr key={demo.id} className="hover:bg-surface-med transition-colors">
@@ -243,7 +246,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
                   <td className="p-4 text-sm font-bold text-mist">{demo.name}</td>
                   <td className="p-4 text-sm text-mist">{demo.client}</td>
                   <td className="p-4 text-sm text-neon font-mono">{demo.url}</td>
-                  <td className="p-4 text-center"><button onClick={() => handleOpenEditDemo(demo)} className="p-2 text-mist-muted hover:text-neon"><Edit2 size={16}/></button></td>
+                  {isAdmin && <td className="p-4 text-center"><button onClick={() => handleOpenEditDemo(demo)} className="p-2 text-mist-muted hover:text-neon"><Edit2 size={16}/></button></td>}
                 </tr>
               ))}
             </tbody>

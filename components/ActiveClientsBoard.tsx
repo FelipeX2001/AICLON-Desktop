@@ -127,6 +127,7 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
   };
 
   const validClients = activeClients.filter(c => !c.isDeleted);
+  const isAdmin = user?.role === 'admin';
 
   return (
     <div className="h-full flex flex-col">
@@ -146,8 +147,8 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
               <div 
                 key={stage}
                 className="w-80 md:w-auto md:flex-1 md:min-w-[280px] flex flex-col bg-surface-low/50 border border-border-subtle rounded-xl overflow-hidden"
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, stage)}
+                onDragOver={isAdmin ? handleDragOver : undefined}
+                onDrop={isAdmin ? (e) => handleDrop(e, stage) : undefined}
               >
                 <div className="p-3 bg-surface-med border-b border-border-subtle flex justify-between items-center sticky top-0 z-10">
                   <span className="font-bold text-sm text-mist uppercase tracking-wide truncate" title={stage}>
@@ -162,8 +163,8 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
                   {stageClients.map((client) => (
                     <div
                       key={client.activeId}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, client.activeId)}
+                      draggable={isAdmin}
+                      onDragStart={isAdmin ? (e) => handleDragStart(e, client.activeId) : undefined}
                       onClick={() => openViewModal(client)}
                       className="client-card bg-night border border-border-subtle rounded-lg hover:border-neon/50 hover:shadow-card-glow transition-all group relative flex flex-col overflow-hidden cursor-pointer"
                     >
@@ -174,9 +175,11 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
                         </div>
                       )}
 
-                      <div className="absolute top-2 right-2 text-mist-muted/20 group-hover:text-mist-muted cursor-grab z-10">
-                        <GripVertical size={14} className="drop-shadow-md" />
-                      </div>
+                      {isAdmin && (
+                        <div className="absolute top-2 right-2 text-mist-muted/20 group-hover:text-mist-muted cursor-grab z-10">
+                          <GripVertical size={14} className="drop-shadow-md" />
+                        </div>
+                      )}
 
                       <div className="p-4 pt-0 relative z-10">
                         <h4 className="font-montserrat font-bold text-mist text-lg pr-6 mb-1 truncate">
@@ -205,21 +208,36 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
                           <div className="text-neon font-bold text-sm">
                             ${client.valor_mensual_servicio}
                           </div>
-                          <button 
-                            onClick={(e) => togglePayment(e, client.activeId)}
-                            className={`flex items-center space-x-2 px-2 py-1 rounded border transition-colors ${
+                          {isAdmin ? (
+                            <button 
+                              onClick={(e) => togglePayment(e, client.activeId)}
+                              className={`flex items-center space-x-2 px-2 py-1 rounded border transition-colors ${
+                                client.pago_mes_actual 
+                                ? 'bg-neon/10 border-neon text-neon' 
+                                : 'bg-night border-mist-muted text-mist-muted hover:bg-white/5'
+                              }`}
+                            >
+                              <div className={`w-3 h-3 rounded-sm border flex items-center justify-center ${
+                                client.pago_mes_actual ? 'border-neon bg-neon text-night' : 'border-mist-muted'
+                              }`}>
+                                {client.pago_mes_actual && <CheckSquare size={10} strokeWidth={4} />}
+                              </div>
+                              <span className="text-[10px] font-bold uppercase">Pago Mes</span>
+                            </button>
+                          ) : (
+                            <div className={`flex items-center space-x-2 px-2 py-1 rounded border ${
                               client.pago_mes_actual 
                               ? 'bg-neon/10 border-neon text-neon' 
-                              : 'bg-night border-mist-muted text-mist-muted hover:bg-white/5'
-                            }`}
-                          >
-                            <div className={`w-3 h-3 rounded-sm border flex items-center justify-center ${
-                              client.pago_mes_actual ? 'border-neon bg-neon text-night' : 'border-mist-muted'
+                              : 'bg-night border-mist-muted text-mist-muted'
                             }`}>
-                              {client.pago_mes_actual && <CheckSquare size={10} strokeWidth={4} />}
+                              <div className={`w-3 h-3 rounded-sm border flex items-center justify-center ${
+                                client.pago_mes_actual ? 'border-neon bg-neon text-night' : 'border-mist-muted'
+                              }`}>
+                                {client.pago_mes_actual && <CheckSquare size={10} strokeWidth={4} />}
+                              </div>
+                              <span className="text-[10px] font-bold uppercase">Pago Mes</span>
                             </div>
-                            <span className="text-[10px] font-bold uppercase">Pago Mes</span>
-                          </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -242,6 +260,7 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
           onClose={() => { setIsViewModalOpen(false); setClientToView(null); }}
           client={clientToView}
           users={users || []}
+          currentUser={user}
           onEdit={handleEditFromView}
         />
       )}

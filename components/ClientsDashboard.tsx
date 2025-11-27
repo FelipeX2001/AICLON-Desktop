@@ -10,6 +10,7 @@ import { Users, TrendingUp, AlertCircle, Briefcase, MapPin, DollarSign, ChevronD
 
 interface ClientsDashboardProps {
   users: User[];
+  currentUser?: User;
   activeClients: ActiveClient[];
   leads: Lead[];
   droppedClients: DroppedClient[];
@@ -24,6 +25,7 @@ interface ClientsDashboardProps {
 
 const ClientsDashboard: React.FC<ClientsDashboardProps> = ({
   users,
+  currentUser,
   activeClients,
   leads,
   droppedClients,
@@ -35,6 +37,7 @@ const ClientsDashboard: React.FC<ClientsDashboardProps> = ({
   onDeleteDroppedClient,
   onRecoverClient
 }) => {
+  const isAdmin = currentUser?.role === 'admin';
   const [showDroppedClients, setShowDroppedClients] = useState(false);
 
   const [clientToView, setClientToView] = useState<ActiveClient | null>(null);
@@ -224,6 +227,7 @@ const ClientsDashboard: React.FC<ClientsDashboardProps> = ({
           <div className="mt-4 animate-in slide-in-from-bottom-4 duration-300">
               <DroppedClientsView 
                 droppedClients={droppedClients}
+                currentUser={currentUser}
                 onRecover={onRecoverClient}
                 onDelete={onDeleteDroppedClient}
               />
@@ -236,6 +240,7 @@ const ClientsDashboard: React.FC<ClientsDashboardProps> = ({
           onClose={() => { setIsClientViewModalOpen(false); setClientToView(null); }}
           client={clientToView}
           users={users}
+          currentUser={currentUser}
           onEdit={handleEditClient}
         />
       )}
@@ -270,6 +275,7 @@ const ClientsDashboard: React.FC<ClientsDashboardProps> = ({
           onClose={() => { setIsLeadViewModalOpen(false); setLeadToView(null); }}
           lead={leadToView}
           users={users}
+          currentUser={currentUser}
           onEdit={handleEditLead}
         />
       )}
