@@ -39,7 +39,14 @@ function transformLeadForClient(lead: any) {
   };
 }
 
+function normalizeServicioInteres(value: any): string[] {
+  if (Array.isArray(value)) return value.filter(Boolean);
+  if (typeof value === 'string' && value.trim()) return [value];
+  return [];
+}
+
 function transformLeadFromClient(data: any) {
+  const rawServicio = data.servicioInteres || data.servicio_interes;
   return {
     etapa: data.etapa,
     assignedUserId: data.assignedUserId ? Number(data.assignedUserId) : null,
@@ -53,7 +60,7 @@ function transformLeadFromClient(data: any) {
     emailSecundario: data.emailSecundario || data.email_secundario,
     web: data.web,
     fuenteOrigen: data.fuenteOrigen || data.fuente_origen,
-    servicioInteres: data.servicioInteres || data.servicio_interes,
+    servicioInteres: normalizeServicioInteres(rawServicio),
     necesidad: data.necesidad,
     fechaEnvioPropuesta: data.fechaEnvioPropuesta || data.fecha_envio_propuesta,
     valorImplementacion: data.valorImplementacion || data.valor_implementacion,

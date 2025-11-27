@@ -512,8 +512,15 @@ const App: React.FC = () => {
         coverPosition: lead.coverPosition
       };
 
+      const normalizeServicio = (val: any): string[] => {
+        if (Array.isArray(val)) return val;
+        if (typeof val === 'string' && val.trim()) return [val];
+        return [];
+      };
+
       if (existingLead) {
         const updated = await leadsAPI.update(Number(lead.id), leadData);
+        const rawServicio = updated.servicio_interes || updated.servicioInteres;
         setLeads(prev => prev.map(l => l.id === lead.id ? {
           ...updated,
           id: String(updated.id),
@@ -522,7 +529,7 @@ const App: React.FC = () => {
           nombre_contacto: updated.nombre_contacto || updated.nombreContacto,
           email_secundario: updated.email_secundario || updated.emailSecundario,
           fuente_origen: updated.fuente_origen || updated.fuenteOrigen,
-          servicio_interes: updated.servicio_interes || updated.servicioInteres,
+          servicio_interes: normalizeServicio(rawServicio),
           fecha_envio_propuesta: updated.fecha_envio_propuesta || updated.fechaEnvioPropuesta,
           valor_implementacion: updated.valor_implementacion || updated.valorImplementacion,
           valor_mensualidad: updated.valor_mensualidad || updated.valorMensualidad,
@@ -534,6 +541,7 @@ const App: React.FC = () => {
         } : l));
       } else {
         const created = await leadsAPI.create(leadData);
+        const rawServicio = created.servicio_interes || created.servicioInteres;
         setLeads(prev => [...prev, {
           ...created,
           id: String(created.id),
@@ -542,7 +550,7 @@ const App: React.FC = () => {
           nombre_contacto: created.nombre_contacto || created.nombreContacto,
           email_secundario: created.email_secundario || created.emailSecundario,
           fuente_origen: created.fuente_origen || created.fuenteOrigen,
-          servicio_interes: created.servicio_interes || created.servicioInteres,
+          servicio_interes: normalizeServicio(rawServicio),
           fecha_envio_propuesta: created.fecha_envio_propuesta || created.fechaEnvioPropuesta,
           valor_implementacion: created.valor_implementacion || created.valorImplementacion,
           valor_mensualidad: created.valor_mensualidad || created.valorMensualidad,

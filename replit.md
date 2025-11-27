@@ -111,6 +111,17 @@ Deployment configured with autoscale:
 - Backend runs compiled JavaScript (no ts-node overhead) for faster startup
 
 ## Recent Changes (Nov 27, 2025)
+- **Multi-selection for Servicio de Interés**: Field changed from single-select to multi-select
+  - Database migration: Changed servicioInteres from varchar to jsonb array
+  - LeadModal: Changed from dropdown to checkboxes for selecting multiple services
+  - Legacy data compatibility: Old string values automatically converted to arrays ["value"]
+  - All components updated: LeadViewModal, ActiveClientViewModal, ActiveClientsBoard, ActiveClientModal
+  - Backend validation: normalizeServicioInteres function ensures array consistency
+  - Services available: "Agente IA", "Pagina Web" (can select both)
+- **Multiple Assignees for Tasks**: Tasks now support multiple assignees
+  - Schema: assigneeId changed to assigneeIds (jsonb array)
+  - UI: Multi-select checkbox interface with overlapping avatar display (max 3 + counter)
+  - TaskBoard and TaskModal updated to handle multiple users
 - **Role-Based Permissions System**: Comprehensive access control for admin vs developer roles
   - Admin (role='admin'): Full access to all features - create, edit, delete everything
   - Developer (role='developer'): Limited access - can only create/edit/delete Tasks & Meetings
