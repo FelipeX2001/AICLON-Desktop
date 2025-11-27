@@ -112,17 +112,19 @@ const App: React.FC = () => {
         ...l,
         id: String(l.id),
         assignedUserId: l.assignedUserId ? String(l.assignedUserId) : undefined,
-        nombre_empresa: l.nombreEmpresa,
-        nombre_contacto: l.nombreContacto,
-        email_secundario: l.emailSecundario,
-        fuente_origen: l.fuenteOrigen,
-        servicio_interes: l.servicioInteres,
-        fecha_envio_propuesta: l.fechaEnvioPropuesta,
-        valor_implementacion: l.valorImplementacion,
-        valor_mensualidad: l.valorMensualidad,
-        fecha_primer_contacto: l.fechaPrimerContacto,
-        resultado_final: l.resultadoFinal,
-        fecha_cierre_real: l.fechaCierreReal
+        nombre_empresa: l.nombre_empresa || l.nombreEmpresa,
+        nombre_contacto: l.nombre_contacto || l.nombreContacto,
+        email_secundario: l.email_secundario || l.emailSecundario,
+        fuente_origen: l.fuente_origen || l.fuenteOrigen,
+        servicio_interes: l.servicio_interes || l.servicioInteres,
+        fecha_envio_propuesta: l.fecha_envio_propuesta || l.fechaEnvioPropuesta,
+        valor_implementacion: l.valor_implementacion || l.valorImplementacion,
+        valor_mensualidad: l.valor_mensualidad || l.valorMensualidad,
+        fecha_primer_contacto: l.fecha_primer_contacto || l.fechaPrimerContacto,
+        resultado_final: l.resultado_final || l.resultadoFinal,
+        fecha_cierre_real: l.fecha_cierre_real || l.fechaCierreReal,
+        coverUrl: l.coverUrl,
+        coverPosition: l.coverPosition
       })));
       
       setActiveClients(activeClientsData.map((ac: any) => ({
@@ -503,14 +505,40 @@ const App: React.FC = () => {
         setLeads(prev => prev.map(l => l.id === lead.id ? {
           ...updated,
           id: String(updated.id),
-          assignedUserId: updated.assignedUserId ? String(updated.assignedUserId) : undefined
+          assignedUserId: updated.assignedUserId ? String(updated.assignedUserId) : undefined,
+          nombre_empresa: updated.nombre_empresa || updated.nombreEmpresa,
+          nombre_contacto: updated.nombre_contacto || updated.nombreContacto,
+          email_secundario: updated.email_secundario || updated.emailSecundario,
+          fuente_origen: updated.fuente_origen || updated.fuenteOrigen,
+          servicio_interes: updated.servicio_interes || updated.servicioInteres,
+          fecha_envio_propuesta: updated.fecha_envio_propuesta || updated.fechaEnvioPropuesta,
+          valor_implementacion: updated.valor_implementacion || updated.valorImplementacion,
+          valor_mensualidad: updated.valor_mensualidad || updated.valorMensualidad,
+          fecha_primer_contacto: updated.fecha_primer_contacto || updated.fechaPrimerContacto,
+          resultado_final: updated.resultado_final || updated.resultadoFinal,
+          fecha_cierre_real: updated.fecha_cierre_real || updated.fechaCierreReal,
+          coverUrl: updated.coverUrl,
+          coverPosition: updated.coverPosition
         } : l));
       } else {
         const created = await leadsAPI.create(leadData);
         setLeads(prev => [...prev, {
           ...created,
           id: String(created.id),
-          assignedUserId: created.assignedUserId ? String(created.assignedUserId) : undefined
+          assignedUserId: created.assignedUserId ? String(created.assignedUserId) : undefined,
+          nombre_empresa: created.nombre_empresa || created.nombreEmpresa,
+          nombre_contacto: created.nombre_contacto || created.nombreContacto,
+          email_secundario: created.email_secundario || created.emailSecundario,
+          fuente_origen: created.fuente_origen || created.fuenteOrigen,
+          servicio_interes: created.servicio_interes || created.servicioInteres,
+          fecha_envio_propuesta: created.fecha_envio_propuesta || created.fechaEnvioPropuesta,
+          valor_implementacion: created.valor_implementacion || created.valorImplementacion,
+          valor_mensualidad: created.valor_mensualidad || created.valorMensualidad,
+          fecha_primer_contacto: created.fecha_primer_contacto || created.fechaPrimerContacto,
+          resultado_final: created.resultado_final || created.resultadoFinal,
+          fecha_cierre_real: created.fecha_cierre_real || created.fechaCierreReal,
+          coverUrl: created.coverUrl,
+          coverPosition: created.coverPosition
         }]);
       }
     } catch (error: any) {
