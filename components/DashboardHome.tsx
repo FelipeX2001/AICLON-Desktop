@@ -18,15 +18,15 @@ interface DashboardHomeProps {
 }
 
 const shortcuts = [
-  { id: '1', label: 'API', iconType: 'api', url: 'https://api.aiclon.io', imageUrl: 'https://www.google.com/s2/favicons?domain=aiclon.io&sz=128' },
+  { id: '1', label: 'API', iconType: 'api', url: 'https://api.aiclon.io', imageUrl: 'https://www.google.com/s2/favicons?domain=api.aiclon.io&sz=128' },
   { id: '2', label: 'Replit', iconType: 'code', url: 'https://replit.com', imageUrl: 'https://www.google.com/s2/favicons?domain=replit.com&sz=128' },
-  { id: '3', label: 'Admin Chats', iconType: 'chat', url: 'https://api.aiclon.io', imageUrl: 'https://www.google.com/s2/favicons?domain=aiclon.io&sz=128' },
+  { id: '3', label: 'Admin Chats', iconType: 'chat', url: 'https://api.aiclon.io', imageUrl: 'https://www.google.com/s2/favicons?domain=api.aiclon.io&sz=128' },
   { id: '4', label: 'Coolify', iconType: 'cloud', url: 'https://app.coolify.io', imageUrl: 'https://www.google.com/s2/favicons?domain=coolify.io&sz=128' },
-  { id: '5', label: 'Evolution', iconType: 'bot', url: 'http://3.83.151.37:8080/manager', imageUrl: 'https://avatars.githubusercontent.com/u/155099025?s=200&v=4' },
+  { id: '5', label: 'Evolution', iconType: 'bot', url: 'http://3.83.151.37:8080/manager', imageUrl: '/images/logos faltantes/evolution-logo.png' },
   { id: '6', label: 'Appwrite', iconType: 'db', url: 'https://appwrite.aiclon.io/console/organization-aiclon', imageUrl: 'https://www.google.com/s2/favicons?domain=appwrite.io&sz=128' },
   { id: '7', label: 'Open Router', iconType: 'network', url: 'https://openrouter.ai', imageUrl: 'https://www.google.com/s2/favicons?domain=openrouter.ai&sz=128' },
-  { id: '8', label: 'ElevenLabs', iconType: 'audio', url: 'https://elevenlabs.io', imageUrl: 'https://www.google.com/s2/favicons?domain=elevenlabs.io&sz=128' },
-  { id: '9', label: 'Chat GPT', iconType: 'ai', url: 'https://chatgpt.com', imageUrl: 'https://www.google.com/s2/favicons?domain=openai.com&sz=128' },
+  { id: '8', label: 'ElevenLabs', iconType: 'audio', url: 'https://elevenlabs.io', imageUrl: '/images/logos faltantes/eleven-labs-ai-logo.png' },
+  { id: '9', label: 'Chat GPT', iconType: 'ai', url: 'https://chatgpt.com', imageUrl: '/images/logos faltantes/gpt-logo.png' },
   { id: '10', label: 'Gemini', iconType: 'ai', url: 'https://gemini.google.com', imageUrl: 'https://www.google.com/s2/favicons?domain=gemini.google.com&sz=128' },
 ];
 
