@@ -1,4 +1,4 @@
-import { pgTable, serial, text, varchar, boolean, timestamp, jsonb, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, text, varchar, boolean, timestamp, jsonb, pgEnum } from 'drizzle-orm/pg-core';
 
 export const taskStatusEnum = pgEnum('task_status', ['Pendiente', 'En proceso', 'En revisión', 'Completada']);
 export const taskPriorityEnum = pgEnum('task_priority', ['Urgente', 'Alta', 'Media', 'Baja']);
@@ -72,7 +72,7 @@ export const meetings = pgTable('meetings', {
 export const leads = pgTable('leads', {
   id: serial('id').primaryKey(),
   etapa: varchar('etapa', { length: 100 }).notNull(),
-  assignedUserId: serial('assigned_user_id').references(() => users.id),
+  assignedUserId: integer('assigned_user_id').references(() => users.id),
   isConverted: boolean('is_converted').default(false),
   
   nombreEmpresa: varchar('nombre_empresa', { length: 255 }).notNull(),
