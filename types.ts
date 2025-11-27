@@ -164,7 +164,7 @@ export interface Lead extends BaseEntity {
   web: string;
   fuente_origen: string;
   // Service Info
-  servicio_interes: string;
+  servicio_interes: string[]; // Array for multi-selection: ["Agente IA", "Pagina Web"]
   necesidad: string;
   fecha_envio_propuesta: string;
   valor_implementacion: string;

@@ -85,7 +85,7 @@ export const leads = pgTable('leads', {
   web: text('web'),
   fuenteOrigen: varchar('fuente_origen', { length: 255 }),
   
-  servicioInteres: varchar('servicio_interes', { length: 255 }),
+  servicioInteres: jsonb('servicio_interes').$type<string[]>().default([]),
   necesidad: text('necesidad'),
   fechaEnvioPropuesta: varchar('fecha_envio_propuesta', { length: 50 }),
   valorImplementacion: varchar('valor_implementacion', { length: 100 }),
