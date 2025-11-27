@@ -233,11 +233,15 @@ export interface TutorialMedia {
   name?: string;
 }
 
+export type StepMediaType = 'image' | 'video' | 'gif';
+
 export interface TutorialStep {
   id: string;
   title: string;
   content: string;
   order: number;
+  mediaUrl?: string;
+  mediaType?: StepMediaType;
 }
 
 export interface Tutorial extends BaseEntity {

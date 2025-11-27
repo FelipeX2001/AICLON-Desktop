@@ -10,6 +10,7 @@ interface ImageUploadFieldProps {
   onPositionChange?: (pos: CoverPosition) => void;
   position?: CoverPosition;
   className?: string;
+  maxWidth?: number;
 }
 
 const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ 
@@ -18,7 +19,8 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
     onChange, 
     onPositionChange,
     position = { x: 50, y: 50, zoom: 1 },
-    className = "" 
+    className = "",
+    maxWidth = 1000
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -33,7 +35,7 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
         img.src = event.target?.result as string;
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 1000; 
+          const MAX_WIDTH = maxWidth; 
           const scaleSize = MAX_WIDTH / img.width;
           const newWidth = Math.min(MAX_WIDTH, img.width);
           const newHeight = img.height * (newWidth / img.width);
@@ -44,7 +46,7 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
           
           if (ctx) {
               ctx.drawImage(img, 0, 0, newWidth, newHeight);
-              const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+              const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
               resolve(compressedDataUrl);
           } else {
               reject(new Error("Canvas context error"));

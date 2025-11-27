@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Tutorial, TutorialStep, TutorialMedia, User } from '../types';
-import { ArrowLeft, Save, Plus, Trash2, GripVertical, Image as ImageIcon, Video, Link as LinkIcon, X } from 'lucide-react';
+import { Tutorial, TutorialStep, User, StepMediaType } from '../types';
+import { ArrowLeft, Save, Plus, Trash2, GripVertical, X } from 'lucide-react';
 import ImageUploadField from './ImageUploadField';
+import StepMediaUpload from './StepMediaUpload';
 
 interface TutorialEditPageProps {
   tutorial: Tutorial;
@@ -14,7 +15,6 @@ interface TutorialEditPageProps {
 const TutorialEditPage: React.FC<TutorialEditPageProps> = ({ tutorial, currentUser, onBack, onSave, onDelete }) => {
   const [formData, setFormData] = useState<Tutorial>({ ...tutorial });
   const [steps, setSteps] = useState<TutorialStep[]>(tutorial.steps || []);
-  const [media, setMedia] = useState<TutorialMedia[]>(tutorial.media || []);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleChange = (field: keyof Tutorial, value: any) => {
@@ -37,6 +37,12 @@ const TutorialEditPage: React.FC<TutorialEditPageProps> = ({ tutorial, currentUs
     setSteps(updated);
   };
 
+  const updateStepMedia = (index: number, url: string, type: StepMediaType | undefined) => {
+    const updated = [...steps];
+    updated[index] = { ...updated[index], mediaUrl: url, mediaType: type };
+    setSteps(updated);
+  };
+
   const removeStep = (index: number) => {
     const updated = steps.filter((_, i) => i !== index);
     setSteps(updated.map((s, i) => ({ ...s, order: i + 1 })));
@@ -52,31 +58,11 @@ const TutorialEditPage: React.FC<TutorialEditPageProps> = ({ tutorial, currentUs
     setSteps(updated.map((s, i) => ({ ...s, order: i + 1 })));
   };
 
-  const addMedia = (type: 'image' | 'video' | 'video_link') => {
-    const newMedia: TutorialMedia = {
-      id: `media_${Date.now()}`,
-      type,
-      url: '',
-      name: ''
-    };
-    setMedia([...media, newMedia]);
-  };
-
-  const updateMedia = (index: number, field: keyof TutorialMedia, value: string) => {
-    const updated = [...media];
-    updated[index] = { ...updated[index], [field]: value };
-    setMedia(updated);
-  };
-
-  const removeMedia = (index: number) => {
-    setMedia(media.filter((_, i) => i !== index));
-  };
-
   const handleSave = () => {
     const updatedTutorial: Tutorial = {
       ...formData,
       steps: steps.length > 0 ? steps : undefined,
-      media: media.filter(m => m.url.trim() !== '')
+      media: []
     };
     onSave(updatedTutorial);
   };
@@ -176,6 +162,7 @@ const TutorialEditPage: React.FC<TutorialEditPageProps> = ({ tutorial, currentUs
                   value={formData.coverUrl || ''}
                   onChange={url => handleChange('coverUrl', url)}
                   label="Imagen de Portada (Banner)"
+                  maxWidth={1920}
                 />
               </div>
             </div>
@@ -239,79 +226,15 @@ const TutorialEditPage: React.FC<TutorialEditPageProps> = ({ tutorial, currentUs
                             className="w-full px-3 py-2 rounded-lg bg-night border border-border-subtle focus:border-neon focus:outline-none text-mist text-sm resize-none"
                             placeholder="Contenido del paso..."
                           />
+                          <StepMediaUpload
+                            mediaUrl={step.mediaUrl}
+                            mediaType={step.mediaType}
+                            onMediaChange={(url, type) => updateStepMedia(index, url, type)}
+                          />
                         </div>
                         
                         <button
                           onClick={() => removeStep(index)}
-                          className="p-2 text-mist-muted hover:text-red-400 transition-colors"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="bg-surface-low border border-border-subtle rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-designer text-mist">Media (Imágenes y Videos)</h2>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => addMedia('image')}
-                    className="px-3 py-1.5 rounded-lg bg-neon/10 border border-neon/30 text-neon text-sm font-medium hover:bg-neon/20 transition-all flex items-center"
-                  >
-                    <ImageIcon size={14} className="mr-1" />
-                    Imagen
-                  </button>
-                  <button
-                    onClick={() => addMedia('video_link')}
-                    className="px-3 py-1.5 rounded-lg bg-neon-orange/10 border border-neon-orange/30 text-neon-orange text-sm font-medium hover:bg-neon-orange/20 transition-all flex items-center"
-                  >
-                    <Video size={14} className="mr-1" />
-                    Video
-                  </button>
-                </div>
-              </div>
-
-              {media.length === 0 ? (
-                <div className="text-center py-8 text-mist-faint italic border-2 border-dashed border-border-subtle rounded-lg">
-                  No hay media agregada. Agrega imágenes o videos al tutorial.
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {media.map((item, index) => (
-                    <div 
-                      key={item.id}
-                      className="bg-surface-med border border-border-subtle rounded-lg p-4"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          item.type === 'image' ? 'bg-neon/20 text-neon' : 'bg-neon-orange/20 text-neon-orange'
-                        }`}>
-                          {item.type === 'image' ? <ImageIcon size={20} /> : <Video size={20} />}
-                        </div>
-                        
-                        <div className="flex-1 space-y-3">
-                          <input
-                            type="text"
-                            value={item.name || ''}
-                            onChange={e => updateMedia(index, 'name', e.target.value)}
-                            className="w-full px-3 py-2 rounded-lg bg-night border border-border-subtle focus:border-neon focus:outline-none text-mist text-sm"
-                            placeholder="Nombre (opcional)"
-                          />
-                          <input
-                            type="url"
-                            value={item.url}
-                            onChange={e => updateMedia(index, 'url', e.target.value)}
-                            className="w-full px-3 py-2 rounded-lg bg-night border border-border-subtle focus:border-neon focus:outline-none text-mist text-sm"
-                            placeholder={item.type === 'image' ? 'URL de la imagen' : 'URL del video (YouTube, Vimeo, etc.)'}
-                          />
-                        </div>
-                        
-                        <button
-                          onClick={() => removeMedia(index)}
                           className="p-2 text-mist-muted hover:text-red-400 transition-colors"
                         >
                           <Trash2 size={16} />

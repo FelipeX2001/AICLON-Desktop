@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tutorial, TutorialStep, User } from '../types';
-import { ArrowLeft, ExternalLink, Calendar, Image as ImageIcon, Video, Edit, Play } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Calendar, Edit } from 'lucide-react';
 
 interface TutorialPageProps {
   tutorial: Tutorial;
@@ -12,8 +12,6 @@ interface TutorialPageProps {
 const TutorialPage: React.FC<TutorialPageProps> = ({ tutorial, currentUser, onBack, onEdit }) => {
   const isAdmin = currentUser?.role === 'admin';
   const steps = tutorial.steps?.sort((a, b) => a.order - b.order) || [];
-  const images = tutorial.media?.filter(m => m.type === 'image') || [];
-  const videos = tutorial.media?.filter(m => m.type === 'video' || m.type === 'video_link') || [];
 
   return (
     <div className="h-full flex flex-col bg-night">
@@ -125,6 +123,26 @@ const TutorialPage: React.FC<TutorialPageProps> = ({ tutorial, currentUser, onBa
                           <div className="text-mist-muted leading-relaxed whitespace-pre-wrap">
                             {step.content}
                           </div>
+                          
+                          {step.mediaUrl && (
+                            <div className="mt-4 rounded-lg overflow-hidden border border-border-subtle">
+                              {step.mediaType === 'video' ? (
+                                <video 
+                                  src={step.mediaUrl} 
+                                  controls 
+                                  className="w-full max-h-96 object-contain bg-black"
+                                >
+                                  Tu navegador no soporta video.
+                                </video>
+                              ) : (
+                                <img 
+                                  src={step.mediaUrl} 
+                                  alt={`Paso ${index + 1}`}
+                                  className="w-full max-h-96 object-contain bg-surface-med"
+                                />
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -133,78 +151,6 @@ const TutorialPage: React.FC<TutorialPageProps> = ({ tutorial, currentUser, onBa
               </div>
             )}
 
-            {images.length > 0 && (
-              <div className="mb-10">
-                <h2 className="text-2xl font-designer text-mist mb-6 flex items-center">
-                  <ImageIcon size={24} className="mr-3 text-neon" />
-                  Imágenes
-                </h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {images.map(img => (
-                    <div 
-                      key={img.id}
-                      className="relative rounded-xl overflow-hidden border border-border-subtle hover:border-neon/50 transition-all group"
-                    >
-                      <img 
-                        src={img.url} 
-                        alt={img.name || 'Tutorial image'}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      {img.name && (
-                        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-night to-transparent">
-                          <span className="text-sm text-mist font-medium">{img.name}</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {videos.length > 0 && (
-              <div className="mb-10">
-                <h2 className="text-2xl font-designer text-mist mb-6 flex items-center">
-                  <Video size={24} className="mr-3 text-neon-orange" />
-                  Videos
-                </h2>
-                
-                <div className="space-y-4">
-                  {videos.map(video => (
-                    <div 
-                      key={video.id}
-                      className="bg-surface-low border border-border-subtle rounded-xl p-4 hover:border-neon-orange/50 transition-all"
-                    >
-                      {video.type === 'video_link' ? (
-                        <a 
-                          href={video.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center text-neon-orange hover:text-white transition-colors"
-                        >
-                          <Play size={20} className="mr-3" />
-                          <span className="font-medium">{video.name || video.url}</span>
-                          <ExternalLink size={14} className="ml-2" />
-                        </a>
-                      ) : (
-                        <div>
-                          <video 
-                            src={video.url} 
-                            controls 
-                            className="w-full rounded-lg"
-                          >
-                            Tu navegador no soporta video.
-                          </video>
-                          {video.name && (
-                            <p className="mt-2 text-sm text-mist-muted">{video.name}</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
