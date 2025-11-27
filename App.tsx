@@ -860,6 +860,8 @@ const App: React.FC = () => {
             tasks={validTasks} 
             meetings={validMeetings}
             demos={validDemos}
+            leads={validLeads}
+            activeClients={validActiveClients}
             onSaveDemo={handleSaveDemo}
             onDeleteDemo={handleDeleteDemo}
             onSaveTask={handleSaveTask}
@@ -885,6 +887,7 @@ const App: React.FC = () => {
             tasks={validTasks}
             meetings={validMeetings}
             activeClients={validActiveClients}
+            leads={validLeads}
             initialTab={profileViewTab}
             onBack={handleCloseUserProfile}
             onEditProfile={handleOpenEditProfile}
@@ -941,6 +944,8 @@ const App: React.FC = () => {
             user={currentUser!} 
             users={validUsers}
             tasks={validTasks}
+            leads={validLeads}
+            activeClients={validActiveClients}
             onSaveTask={handleSaveTask}
             onDeleteTask={handleDeleteTask}
           />
@@ -951,6 +956,8 @@ const App: React.FC = () => {
             user={currentUser!} 
             users={validUsers}
             meetings={validMeetings}
+            leads={validLeads}
+            activeClients={validActiveClients}
             onSaveMeeting={handleSaveMeeting}
             onDeleteMeeting={handleDeleteMeeting}
           />
@@ -1018,6 +1025,8 @@ const App: React.FC = () => {
             tasks={validTasks} 
             meetings={validMeetings}
             demos={validDemos}
+            leads={validLeads}
+            activeClients={validActiveClients}
             onSaveDemo={handleSaveDemo}
             onDeleteDemo={handleDeleteDemo}
             onSaveTask={handleSaveTask}

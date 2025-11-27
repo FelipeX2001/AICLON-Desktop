@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useMemo } from 'react';
-import { Task, TaskStatus, TaskPriority, User, Lead } from '../types';
+import { Task, TaskStatus, TaskPriority, User, Lead, ActiveClient } from '../types';
 import TaskModal from './TaskModal';
 import TaskViewModal from './TaskViewModal';
 import { Plus, GripVertical, Building2, Clock, User as UserIcon, ListChecks } from 'lucide-react';
@@ -9,11 +9,13 @@ interface TaskBoardProps {
   user: User; 
   users: User[];
   tasks: Task[];
+  leads?: Lead[];
+  activeClients?: ActiveClient[];
   onSaveTask: (task: Task) => void;
   onDeleteTask: (taskId: string) => void;
 }
 
-const TaskBoard: React.FC<TaskBoardProps> = ({ user, users, tasks, onSaveTask, onDeleteTask }) => {
+const TaskBoard: React.FC<TaskBoardProps> = ({ user, users, tasks, leads = [], activeClients = [], onSaveTask, onDeleteTask }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -25,14 +27,21 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users, tasks, onSaveTask, o
 
   const clients = useMemo(() => {
     const clientNames = new Set<string>();
+    
+    leads.forEach(l => {
+      if (l.nombre_empresa) clientNames.add(l.nombre_empresa);
+    });
+    
+    activeClients.forEach(c => {
+      if (c.nombre_empresa) clientNames.add(c.nombre_empresa);
+    });
+    
     tasks.forEach(t => {
       if (t.clientName) clientNames.add(t.clientName);
     });
-    if (clientNames.size === 0) {
-      ['TechCorp', 'Imperio de la Moda', 'Dr. Jhon García', 'Witnam'].forEach(n => clientNames.add(n));
-    }
-    return Array.from(clientNames);
-  }, [tasks]);
+    
+    return Array.from(clientNames).sort();
+  }, [leads, activeClients, tasks]);
 
   const handleSaveTask = (task: Task) => {
     onSaveTask(task);

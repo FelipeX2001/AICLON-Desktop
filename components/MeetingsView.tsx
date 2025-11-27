@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { MeetingEvent, User } from '../types';
+import { MeetingEvent, User, Lead, ActiveClient } from '../types';
 import MeetingModal from './MeetingModal';
 import MeetingViewModal from './MeetingViewModal';
 import { ChevronLeft, ChevronRight, Plus, ExternalLink, Users } from 'lucide-react';
@@ -9,11 +9,13 @@ interface MeetingsViewProps {
   user: User;
   users: User[];
   meetings: MeetingEvent[];
+  leads?: Lead[];
+  activeClients?: ActiveClient[];
   onSaveMeeting: (meeting: MeetingEvent) => void;
   onDeleteMeeting: (meetingId: string) => void;
 }
 
-const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, onSaveMeeting, onDeleteMeeting }) => {
+const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, leads = [], activeClients = [], onSaveMeeting, onDeleteMeeting }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,12 +24,13 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, onSa
 
   const clients = useMemo(() => {
     const clientNames = new Set<string>();
+    leads.forEach(l => { if (l.nombre_empresa) clientNames.add(l.nombre_empresa); });
+    activeClients.forEach(c => { if (c.nombre_empresa) clientNames.add(c.nombre_empresa); });
     meetings.forEach(m => {
       if (m.clientId) clientNames.add(m.clientId);
     });
-    if (clientNames.size === 0) ['TechCorp', 'Imperio de la Moda'].forEach(n => clientNames.add(n));
-    return Array.from(clientNames);
-  }, [meetings]);
+    return Array.from(clientNames).sort();
+  }, [leads, activeClients, meetings]);
 
   const getStartOfWeek = (d: Date) => {
     const date = new Date(d);

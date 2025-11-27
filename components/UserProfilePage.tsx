@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useMemo } from 'react';
-import { User, Task, MeetingEvent, ActiveClient, TaskStatus, TaskPriority } from '../types';
+import { User, Task, MeetingEvent, ActiveClient, Lead, TaskStatus, TaskPriority } from '../types';
 import TaskModal from './TaskModal';
 import TaskViewModal from './TaskViewModal';
 import MeetingModal from './MeetingModal';
@@ -19,6 +19,7 @@ interface UserProfilePageProps {
   tasks: Task[];
   meetings: MeetingEvent[];
   activeClients: ActiveClient[];
+  leads?: Lead[];
   initialTab?: ProfileTab;
   onBack: () => void;
   onEditProfile: (user: User) => void;
@@ -35,6 +36,7 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({
   tasks,
   meetings,
   activeClients,
+  leads = [],
   initialTab = 'tasks',
   onBack,
   onEditProfile,
@@ -158,6 +160,8 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({
             user={user}
             users={allUsers}
             tasks={userTasks}
+            leads={leads}
+            activeClients={activeClients}
             onSaveTask={onSaveTask}
             onDeleteTask={onDeleteTask}
           />
@@ -167,6 +171,8 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({
             user={user}
             users={allUsers}
             meetings={userMeetings}
+            leads={leads}
+            activeClients={activeClients}
             onSaveMeeting={onSaveMeeting}
             onDeleteMeeting={onDeleteMeeting}
           />
@@ -185,11 +191,13 @@ interface UserTasksTabProps {
   user: User;
   users: User[];
   tasks: Task[];
+  leads?: Lead[];
+  activeClients?: ActiveClient[];
   onSaveTask: (task: Task) => void;
   onDeleteTask: (taskId: string) => void;
 }
 
-const UserTasksTab: React.FC<UserTasksTabProps> = ({ user, users, tasks, onSaveTask, onDeleteTask }) => {
+const UserTasksTab: React.FC<UserTasksTabProps> = ({ user, users, tasks, leads = [], activeClients = [], onSaveTask, onDeleteTask }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -201,14 +209,11 @@ const UserTasksTab: React.FC<UserTasksTabProps> = ({ user, users, tasks, onSaveT
 
   const clients = useMemo(() => {
     const clientNames = new Set<string>();
-    tasks.forEach(t => {
-      if (t.clientName) clientNames.add(t.clientName);
-    });
-    if (clientNames.size === 0) {
-      ['TechCorp', 'Imperio de la Moda', 'Dr. Jhon García', 'Witnam'].forEach(n => clientNames.add(n));
-    }
-    return Array.from(clientNames);
-  }, [tasks]);
+    leads.forEach(l => { if (l.nombre_empresa) clientNames.add(l.nombre_empresa); });
+    activeClients.forEach(c => { if (c.nombre_empresa) clientNames.add(c.nombre_empresa); });
+    tasks.forEach(t => { if (t.clientName) clientNames.add(t.clientName); });
+    return Array.from(clientNames).sort();
+  }, [leads, activeClients, tasks]);
 
   const handleSaveTask = (task: Task) => {
     onSaveTask(task);
@@ -498,23 +503,26 @@ interface UserMeetingsTabProps {
   user: User;
   users: User[];
   meetings: MeetingEvent[];
+  leads?: Lead[];
+  activeClients?: ActiveClient[];
   onSaveMeeting: (meeting: MeetingEvent) => void;
   onDeleteMeeting: (meetingId: string) => void;
 }
 
-const UserMeetingsTab: React.FC<UserMeetingsTabProps> = ({ user, users, meetings, onSaveMeeting, onDeleteMeeting }) => {
+const UserMeetingsTab: React.FC<UserMeetingsTabProps> = ({ user, users, meetings, leads = [], activeClients = [], onSaveMeeting, onDeleteMeeting }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<MeetingEvent | null>(null);
 
   const clients = useMemo(() => {
     const clientNames = new Set<string>();
+    leads.forEach(l => { if (l.nombre_empresa) clientNames.add(l.nombre_empresa); });
+    activeClients.forEach(c => { if (c.nombre_empresa) clientNames.add(c.nombre_empresa); });
     meetings.forEach(m => {
       if (m.clientId) clientNames.add(m.clientId);
     });
-    if (clientNames.size === 0) ['TechCorp', 'Imperio de la Moda'].forEach(n => clientNames.add(n));
-    return Array.from(clientNames);
-  }, [meetings]);
+    return Array.from(clientNames).sort();
+  }, [leads, activeClients, meetings]);
 
   const getStartOfWeek = (d: Date) => {
     const date = new Date(d);

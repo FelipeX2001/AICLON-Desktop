@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { User, Task, MeetingEvent, Demo, TaskStatus, TaskPriority } from '../types';
+import { User, Task, MeetingEvent, Demo, TaskStatus, TaskPriority, Lead, ActiveClient } from '../types';
 import { Clock, Users, Plus, Edit2, Bot, X, Building2, Calendar, AlertTriangle, User as UserIcon, ListChecks } from 'lucide-react';
 import TaskViewModal from './TaskViewModal';
 import TaskModal from './TaskModal';
@@ -11,6 +11,8 @@ interface DashboardHomeProps {
   tasks: Task[];
   meetings: MeetingEvent[];
   demos: Demo[];
+  leads?: Lead[];
+  activeClients?: ActiveClient[];
   onSaveDemo: (demo: Demo) => void;
   onDeleteDemo: (demoId: string) => void;
   onSaveTask: (task: Task) => void;
@@ -30,7 +32,7 @@ const shortcuts = [
   { id: '10', label: 'Gemini', iconType: 'ai', url: 'https://gemini.google.com', imageUrl: 'https://www.google.com/s2/favicons?domain=gemini.google.com&sz=128' },
 ];
 
-const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks = [], meetings = [], demos = [], onSaveDemo, onDeleteDemo, onSaveTask, onDeleteTask }) => {
+const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks = [], meetings = [], demos = [], leads = [], activeClients = [], onSaveDemo, onDeleteDemo, onSaveTask, onDeleteTask }) => {
   const today = new Date().toISOString().split('T')[0];
   
   const myTasksToday = tasks.filter(t => 
@@ -57,9 +59,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
 
   const clients = React.useMemo(() => {
     const clientNames = new Set<string>();
+    leads.forEach(l => { if (l.nombre_empresa) clientNames.add(l.nombre_empresa); });
+    activeClients.forEach(c => { if (c.nombre_empresa) clientNames.add(c.nombre_empresa); });
     tasks.forEach(t => { if (t.clientName) clientNames.add(t.clientName); });
-    return Array.from(clientNames);
-  }, [tasks]);
+    return Array.from(clientNames).sort();
+  }, [leads, activeClients, tasks]);
 
   const openViewModal = (task: Task) => {
     setSelectedTask(task);
