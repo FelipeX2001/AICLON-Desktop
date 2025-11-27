@@ -21,7 +21,7 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
 }) => {
   if (!isOpen || !task) return null;
 
-  const assignee = users.find(u => u.id === task.assigneeId);
+  const assignees = users.filter(u => task.assigneeIds?.includes(u.id));
 
   const getPriorityColor = (priority: TaskPriority) => {
     switch(priority) {
@@ -110,17 +110,23 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-2">
-                <UserIcon size={14}/> Encargado
+                <UserIcon size={14}/> Encargados {assignees.length > 0 && <span className="text-neon">({assignees.length})</span>}
               </label>
-              <div className="flex items-center gap-2 bg-surface-low/50 rounded-lg p-2 border border-border-subtle">
-                {assignee?.avatarUrl ? (
-                  <img src={assignee.avatarUrl} alt={assignee.name} className="w-6 h-6 rounded-full object-cover" />
-                ) : (
-                  <div className="w-6 h-6 rounded-full bg-neon/20 flex items-center justify-center">
-                    <UserIcon size={12} className="text-neon" />
+              <div className="flex flex-wrap gap-2 bg-surface-low/50 rounded-lg p-2 border border-border-subtle min-h-[40px]">
+                {assignees.length > 0 ? assignees.map(assignee => (
+                  <div key={assignee.id} className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-neon/10 border border-neon/30">
+                    {assignee.avatarUrl ? (
+                      <img src={assignee.avatarUrl} alt={assignee.name} className="w-5 h-5 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-neon/20 flex items-center justify-center">
+                        <UserIcon size={10} className="text-neon" />
+                      </div>
+                    )}
+                    <span className="text-xs text-mist">{assignee.name}</span>
                   </div>
+                )) : (
+                  <span className="text-sm text-mist-muted">Sin asignar</span>
                 )}
-                <span className="text-sm text-mist">{assignee?.name || 'Sin asignar'}</span>
               </div>
             </div>
             <div className="space-y-1">

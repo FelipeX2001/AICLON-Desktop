@@ -47,7 +47,7 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<ProfileTab>(initialTab);
 
-  const userTasks = tasks.filter(t => t.assigneeId === user.id && !t.isDeleted);
+  const userTasks = tasks.filter(t => t.assigneeIds?.includes(user.id) && !t.isDeleted);
   const userMeetings = meetings.filter(m => m.attendeeIds.includes(user.id) && !m.isDeleted);
   const userClients = activeClients.filter(c => c.assignedUserId === user.id && !c.isDeleted);
 
@@ -370,7 +370,7 @@ const UserTasksTab: React.FC<UserTasksTabProps> = ({ user, users, tasks, leads =
 
                 <div className="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
                   {sortedStatusTasks.map((task) => {
-                    const assignee = users.find(u => u.id === task.assigneeId);
+                    const assignees = users.filter(u => task.assigneeIds?.includes(u.id));
                     const subtasks = task.subtasks || [];
                     const completedSubtasks = subtasks.filter(s => s.completed).length;
                     const totalSubtasks = subtasks.length;
@@ -434,17 +434,25 @@ const UserTasksTab: React.FC<UserTasksTabProps> = ({ user, users, tasks, leads =
                             </div>
                             
                             <div className="flex justify-between items-center pt-2 border-t border-border-subtle/50">
-                              <div className="flex items-center" title={`Encargado: ${assignee?.name || 'Sin asignar'}`}>
-                                {assignee ? (
-                                  <img src={assignee.avatarUrl} alt={assignee.name} className="w-5 h-5 rounded-full border border-border-subtle object-cover mr-2" />
-                                ) : (
-                                  <div className="w-5 h-5 rounded-full bg-surface-med border border-border-subtle flex items-center justify-center mr-2">
-                                    <UserIcon size={12} className="text-mist-muted" />
+                              <div className="flex items-center -space-x-1" title={`Encargados: ${assignees.map(a => a.name).join(', ') || 'Sin asignar'}`}>
+                                {assignees.length > 0 ? assignees.slice(0, 3).map((assignee, idx) => (
+                                  assignee.avatarUrl ? (
+                                    <img key={assignee.id} src={assignee.avatarUrl} alt={assignee.name} className="w-5 h-5 rounded-full border border-night object-cover" style={{ zIndex: 3 - idx }} />
+                                  ) : (
+                                    <div key={assignee.id} className="w-5 h-5 rounded-full bg-surface-med border border-night flex items-center justify-center" style={{ zIndex: 3 - idx }}>
+                                      <UserIcon size={10} className="text-mist-muted" />
+                                    </div>
+                                  )
+                                )) : (
+                                  <div className="w-5 h-5 rounded-full bg-surface-med border border-border-subtle flex items-center justify-center">
+                                    <UserIcon size={10} className="text-mist-muted" />
                                   </div>
                                 )}
-                                <span className="text-[10px] text-mist-muted truncate max-w-[80px]">
-                                  {assignee?.name.split(' ')[0] || 'N/A'}
-                                </span>
+                                {assignees.length > 3 && (
+                                  <div className="w-5 h-5 rounded-full bg-neon/20 border border-night flex items-center justify-center text-[8px] text-neon font-bold">
+                                    +{assignees.length - 3}
+                                  </div>
+                                )}
                               </div>
                               <div className="flex items-center text-[10px] text-mist-muted font-mono bg-surface-med px-1.5 py-0.5 rounded">
                                 <Clock size={10} className="mr-1" />

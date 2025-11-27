@@ -344,7 +344,7 @@ const App: React.FC = () => {
           title: task.title,
           description: task.description,
           status: task.status,
-          assigneeId: Number(task.assigneeId),
+          assigneeIds: task.assigneeIds.map(Number),
           clientName: task.clientName,
           priority: task.priority,
           deadline: task.deadline,
@@ -357,18 +357,19 @@ const App: React.FC = () => {
         setTasks(prev => prev.map(t => t.id === task.id ? {
           ...updated,
           id: String(updated.id),
-          assigneeId: String(updated.assigneeId)
+          assigneeIds: (updated.assigneeIds || []).map(String)
         } : t));
         
-        if (existingTask.assigneeId !== task.assigneeId) {
-          addNotification(task.assigneeId, `Se te ha asignado la tarea: ${task.title}`, 'task_assigned', task.id);
-        }
+        const newAssignees = task.assigneeIds.filter(id => !existingTask.assigneeIds.includes(id));
+        newAssignees.forEach(assigneeId => {
+          addNotification(assigneeId, `Se te ha asignado la tarea: ${task.title}`, 'task_assigned', task.id);
+        });
       } else {
         const created = await tasksAPI.create({
           title: task.title,
           description: task.description,
           status: task.status,
-          assigneeId: Number(task.assigneeId),
+          assigneeIds: task.assigneeIds.map(Number),
           clientName: task.clientName,
           priority: task.priority,
           deadline: task.deadline,
@@ -380,9 +381,11 @@ const App: React.FC = () => {
         setTasks(prev => [...prev, {
           ...created,
           id: String(created.id),
-          assigneeId: String(created.assigneeId)
+          assigneeIds: (created.assigneeIds || []).map(String)
         }]);
-        addNotification(task.assigneeId, `Se te ha asignado la tarea: ${task.title}`, 'task_assigned', String(created.id));
+        task.assigneeIds.forEach(assigneeId => {
+          addNotification(assigneeId, `Se te ha asignado la tarea: ${task.title}`, 'task_assigned', String(created.id));
+        });
       }
     } catch (error: any) {
       alert("Error al guardar tarea: " + error.message);

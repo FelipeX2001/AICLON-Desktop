@@ -65,7 +65,7 @@ export interface Task extends BaseEntity {
   title: string;
   description?: string; 
   status: TaskStatus;
-  assigneeId: string;
+  assigneeIds: string[]; // Multiple assignees
   clientName: string;
   priority: TaskPriority;
   deadline: string; // YYYY-MM-DD

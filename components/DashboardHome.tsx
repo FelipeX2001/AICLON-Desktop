@@ -37,7 +37,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
   
   const myTasksToday = tasks.filter(t => 
     !t.isDeleted &&
-    t.assigneeId === user.id &&
+    t.assigneeIds?.includes(user.id) &&
     t.deadline === today &&
     t.status !== TaskStatus.Completed
   );

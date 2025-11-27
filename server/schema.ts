@@ -31,7 +31,7 @@ export const tasks = pgTable('tasks', {
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   status: taskStatusEnum('status').notNull().default('Pendiente'),
-  assigneeId: serial('assignee_id').references(() => users.id),
+  assigneeIds: jsonb('assignee_ids').notNull().$type<number[]>().default([]),
   clientName: varchar('client_name', { length: 255 }),
   priority: taskPriorityEnum('priority').notNull().default('Media'),
   deadline: varchar('deadline', { length: 50 }),

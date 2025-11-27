@@ -6,12 +6,13 @@ import { eq } from 'drizzle-orm';
 const router = Router();
 
 const transformTaskForClient = (dbTask: any) => {
+  const assigneeIds = dbTask.assigneeIds || dbTask.assignee_ids || [];
   return {
     id: String(dbTask.id),
     title: dbTask.title,
     description: dbTask.description || '',
     status: dbTask.status,
-    assigneeId: dbTask.assigneeId ? String(dbTask.assigneeId) : (dbTask.assignee_id ? String(dbTask.assignee_id) : ''),
+    assigneeIds: Array.isArray(assigneeIds) ? assigneeIds.map((id: any) => String(id)) : [],
     clientName: dbTask.clientName || dbTask.client_name || '',
     priority: dbTask.priority,
     deadline: dbTask.deadline || '',
@@ -33,7 +34,11 @@ const transformTaskFromClient = (clientTask: any) => {
   if (clientTask.title !== undefined) transformed.title = clientTask.title;
   if (clientTask.description !== undefined) transformed.description = clientTask.description;
   if (clientTask.status !== undefined) transformed.status = clientTask.status;
-  if (clientTask.assigneeId !== undefined) transformed.assigneeId = clientTask.assigneeId ? Number(clientTask.assigneeId) : null;
+  if (clientTask.assigneeIds !== undefined) {
+    transformed.assigneeIds = Array.isArray(clientTask.assigneeIds) 
+      ? clientTask.assigneeIds.map((id: any) => Number(id))
+      : [];
+  }
   if (clientTask.clientName !== undefined) transformed.clientName = clientTask.clientName;
   if (clientTask.priority !== undefined) transformed.priority = clientTask.priority;
   if (clientTask.deadline !== undefined) transformed.deadline = clientTask.deadline;

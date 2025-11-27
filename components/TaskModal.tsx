@@ -28,7 +28,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [formData, setFormData] = useState<Partial<Task>>({
     status: TaskStatus.Pending,
     priority: TaskPriority.Medium,
-    deadline: new Date().toISOString().split('T')[0]
+    deadline: new Date().toISOString().split('T')[0],
+    assigneeIds: []
   });
 
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -45,7 +46,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 status: TaskStatus.Pending,
                 priority: TaskPriority.Medium,
                 deadline: new Date().toISOString().split('T')[0],
-                assigneeId: defaultAssigneeId || '',
+                assigneeIds: defaultAssigneeId ? [defaultAssigneeId] : [],
                 clientName: '',
                 description: '',
                 subtasks: [],
@@ -88,21 +89,30 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   if (!isOpen) return null;
 
+  const toggleAssignee = (userId: string) => {
+    setFormData(prev => {
+      const currentIds = prev.assigneeIds || [];
+      if (currentIds.includes(userId)) {
+        return { ...prev, assigneeIds: currentIds.filter(id => id !== userId) };
+      } else {
+        return { ...prev, assigneeIds: [...currentIds, userId] };
+      }
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.title && formData.assigneeId && formData.clientName) {
+    if (formData.title && (formData.assigneeIds?.length || 0) > 0 && formData.clientName) {
       const newTaskData: any = {
         ...formData,
         id: taskToEdit?.id || Date.now().toString(),
       };
 
-      // Handle completedAt logic manually
       if (formData.status === TaskStatus.Completed && (!taskToEdit || taskToEdit.status !== TaskStatus.Completed)) {
           newTaskData.completedAt = new Date().toISOString();
       } else if (formData.status !== TaskStatus.Completed) {
           newTaskData.completedAt = undefined;
       } else if (taskToEdit?.status === TaskStatus.Completed) {
-          // Keep existing date if already completed
           newTaskData.completedAt = taskToEdit.completedAt;
       }
 
@@ -161,35 +171,51 @@ const TaskModal: React.FC<TaskModalProps> = ({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-             <div className="space-y-1">
-                <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-2">
-                    <UserIcon size={14}/> Encargado
-                </label>
-                <select 
-                    required
-                    value={formData.assigneeId || ''} 
-                    onChange={e => setFormData({...formData, assigneeId: e.target.value})} 
-                    className="w-full bg-surface-low border border-border-subtle rounded p-2 text-mist focus:border-neon focus:outline-none"
-                >
-                    <option value="">Seleccionar</option>
-                    {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                </select>
-             </div>
-             <div className="space-y-1">
-                <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-2">
-                    <Building2 size={14}/> Cliente
-                </label>
-                <select 
-                    required
-                    value={formData.clientName || ''} 
-                    onChange={e => setFormData({...formData, clientName: e.target.value})} 
-                    className="w-full bg-surface-low border border-border-subtle rounded p-2 text-mist focus:border-neon focus:outline-none"
-                >
-                    <option value="">Seleccionar</option>
-                    {clients.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-             </div>
+          <div className="space-y-1">
+            <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-2">
+                <UserIcon size={14}/> Encargados {(formData.assigneeIds?.length || 0) > 0 && <span className="text-neon">({formData.assigneeIds?.length})</span>}
+            </label>
+            <div className="flex flex-wrap gap-2 bg-surface-low border border-border-subtle rounded p-2 min-h-[42px]">
+              {users.map(u => {
+                const isSelected = formData.assigneeIds?.includes(u.id);
+                return (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => toggleAssignee(u.id)}
+                    className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs transition-all ${
+                      isSelected 
+                        ? 'bg-neon/20 text-neon border border-neon/50' 
+                        : 'bg-surface-med text-mist-muted border border-transparent hover:border-border-subtle hover:text-mist'
+                    }`}
+                  >
+                    {u.avatarUrl ? (
+                      <img src={u.avatarUrl} alt={u.name} className="w-4 h-4 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-4 h-4 rounded-full bg-neon/20 flex items-center justify-center">
+                        <UserIcon size={8} className="text-neon" />
+                      </div>
+                    )}
+                    {u.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-2">
+                <Building2 size={14}/> Cliente
+            </label>
+            <select 
+                required
+                value={formData.clientName || ''} 
+                onChange={e => setFormData({...formData, clientName: e.target.value})} 
+                className="w-full bg-surface-low border border-border-subtle rounded p-2 text-mist focus:border-neon focus:outline-none"
+            >
+                <option value="">Seleccionar</option>
+                {clients.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
