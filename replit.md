@@ -92,7 +92,7 @@ A CRM-style desktop application for managing:
 - **Two-server setup**: Frontend (Vite dev server on port 5000) + Backend (Express API on port 3001)
 - **Proxy configuration**: Vite proxies `/api/*` requests to backend
 - **Authentication**: Database-backed with secure bcrypt password hashing
-- **Data persistence**: PostgreSQL for users (other entities still use localStorage for now)
+- **Data persistence**: All entities persist through PostgreSQL API (no localStorage except theme preference)
 
 ## Development
 ```bash
@@ -111,6 +111,14 @@ Deployment configured with autoscale:
 - Backend runs compiled JavaScript (no ts-node overhead) for faster startup
 
 ## Recent Changes (Nov 27, 2025)
+- **View Modal Pattern**: All entity boards now follow consistent view → edit modal pattern
+  - LeadViewModal.tsx: Read-only lead details with edit button
+  - ActiveClientViewModal.tsx: Read-only client details with edit button
+  - MeetingViewModal.tsx: Read-only meeting details with edit button
+  - BotVersionViewModal.tsx: Read-only bot version details with edit button
+  - Click card → View modal (read-only) → Edit button → Edit modal
+- **ClientsDashboard Fix**: Fixed critical bug where localStorage was used instead of API data, causing phantom/stale clients
+- **DroppedClientsView**: Refactored to use props from App.tsx instead of localStorage
 - **Full-page User Profile View (UserProfilePage.tsx)**: Complete profile page with three functional tabs
   - Header with cover image, avatar, user info, and role badge
   - Tasks Tab: Full Kanban board filtered by user with drag-and-drop, auto-assigns user when creating new tasks
