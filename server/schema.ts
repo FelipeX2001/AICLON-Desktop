@@ -4,7 +4,7 @@ export const taskStatusEnum = pgEnum('task_status', ['Pendiente', 'En proceso', 
 export const taskPriorityEnum = pgEnum('task_priority', ['Urgente', 'Alta', 'Media', 'Baja']);
 export const userRoleEnum = pgEnum('user_role', ['admin', 'developer']);
 export const activeClientStageEnum = pgEnum('active_client_stage', ['En servicio', 'Pendiente de pago', 'Desarrollos extra']);
-export const botTypeEnum = pgEnum('bot_type', ['evolution', 'meta', 'chatwoot']);
+export const botTypeEnum = pgEnum('bot_type', ['evolution', 'meta', 'chatbot']);
 export const currentClientStatusEnum = pgEnum('current_client_status', ['Activo', 'En Pausa', 'Cancelado']);
 
 export const users = pgTable('users', {

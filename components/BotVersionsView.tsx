@@ -155,7 +155,7 @@ const BotVersionsView: React.FC<BotVersionsViewProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full pb-4">
           <BotList type="evolution" title="Bot Evolution" />
           <BotList type="meta" title="Bot Meta" />
-          <BotList type="chatwoot" title="Bot Chatwoot" />
+          <BotList type="chatbot" title="Bot Chatbot" />
         </div>
       </div>
 

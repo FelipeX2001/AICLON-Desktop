@@ -208,7 +208,7 @@ export interface DroppedClient extends BaseEntity {
 }
 
 // --- BOT VERSIONS ---
-export type BotType = 'evolution' | 'meta' | 'chatwoot';
+export type BotType = 'evolution' | 'meta' | 'chatbot';
 
 export interface BotVersion extends BaseEntity {
   id: string;
