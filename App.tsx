@@ -15,6 +15,7 @@ import MeetingsView from './components/MeetingsView';
 import BotVersionsView from './components/BotVersionsView';
 import TutorialsView from './components/TutorialsView';
 import UserEditModal from './components/UserEditModal';
+import UserProfilePage from './components/UserProfilePage';
 import { User, Task, MeetingEvent, ActiveClient, Lead, Notification, BotVersion, Tutorial, Demo, DroppedClient } from './types';
 import { 
   authAPI, 
@@ -56,6 +57,9 @@ const App: React.FC = () => {
 
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
+
+  const [profileViewUser, setProfileViewUser] = useState<User | null>(null);
+  const [profileViewTab, setProfileViewTab] = useState<'tasks' | 'meetings' | 'clients'>('tasks');
 
   const loadAllData = useCallback(async () => {
     try {
@@ -744,6 +748,17 @@ const App: React.FC = () => {
     setIsEditProfileOpen(true);
   };
 
+  const handleViewUserProfile = (user: User, tab: 'tasks' | 'meetings' | 'clients' = 'tasks') => {
+    setProfileViewUser(user);
+    setProfileViewTab(tab);
+    setCurrentView('user-profile');
+  };
+
+  const handleCloseUserProfile = () => {
+    setProfileViewUser(null);
+    setCurrentView('team');
+  };
+
   const renderContent = () => {
     const validUsers = users.filter(u => !u.isDeleted);
     const validTasks = tasks.filter(t => !t.isDeleted);
@@ -782,11 +797,27 @@ const App: React.FC = () => {
           <TeamView 
             users={validUsers} 
             currentUser={currentUser!} 
-            onEditUser={handleOpenEditProfile} 
-            tasks={validTasks} 
-            meetings={validMeetings} 
-            activeClients={validActiveClients} 
-            leads={validLeads} 
+            onEditUser={handleOpenEditProfile}
+            onViewUserProfile={(user) => handleViewUserProfile(user, 'tasks')}
+          />
+        );
+      case 'user-profile':
+        if (!profileViewUser) return null;
+        return (
+          <UserProfilePage
+            user={profileViewUser}
+            currentUser={currentUser!}
+            allUsers={validUsers}
+            tasks={validTasks}
+            meetings={validMeetings}
+            activeClients={validActiveClients}
+            initialTab={profileViewTab}
+            onBack={handleCloseUserProfile}
+            onEditProfile={handleOpenEditProfile}
+            onSaveTask={handleSaveTask}
+            onDeleteTask={handleDeleteTask}
+            onSaveMeeting={handleSaveMeeting}
+            onDeleteMeeting={handleDeleteMeeting}
           />
         );
       case 'clients-process':
@@ -904,6 +935,8 @@ const App: React.FC = () => {
           onNavigate={setCurrentView}
           currentView={currentView}
           onEditProfile={() => handleOpenEditProfile(currentUser!)}
+          onViewMyTasks={() => handleViewUserProfile(currentUser!, 'tasks')}
+          onViewMyMeetings={() => handleViewUserProfile(currentUser!, 'meetings')}
           notifications={notifications}
           onMarkNotificationRead={handleMarkNotificationRead}
         >

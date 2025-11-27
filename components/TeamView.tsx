@@ -1,32 +1,22 @@
 
-import React, { useState } from 'react';
-import { User, Task, MeetingEvent, ActiveClient, Lead } from '../types';
+import React from 'react';
+import { User } from '../types';
 import { Shield, Mail, Plus } from 'lucide-react';
-import UserProfileDetailModal from './UserProfileDetailModal';
 
 interface TeamViewProps {
   users: User[];
   currentUser: User;
   onEditUser: (user: User) => void;
-  tasks?: Task[];
-  meetings?: MeetingEvent[];
-  activeClients?: ActiveClient[];
-  leads?: Lead[];
+  onViewUserProfile: (user: User) => void;
 }
 
 const TeamView: React.FC<TeamViewProps> = ({ 
   users, 
   currentUser, 
   onEditUser,
-  tasks = [],
-  meetings = [],
-  activeClients = [],
-  leads = []
+  onViewUserProfile
 }) => {
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-
   const handleCreateUser = () => {
-      // Pass a skeleton user to trigger "Create Mode" in the parent modal
       onEditUser({} as User);
   };
 
@@ -55,7 +45,7 @@ const TeamView: React.FC<TeamViewProps> = ({
           return (
             <div 
               key={user.id} 
-              onClick={() => setSelectedUser(user)}
+              onClick={() => onViewUserProfile(user)}
               className="relative group bg-surface-low border border-border-subtle rounded-2xl p-8 hover:bg-surface-med hover:border-neon/30 transition-all duration-300 shadow-lg hover:shadow-neon-glow/20 cursor-pointer flex flex-col items-center text-center"
             >
               {/* Role Badge */}
@@ -93,22 +83,6 @@ const TeamView: React.FC<TeamViewProps> = ({
         })}
       </div>
 
-      {selectedUser && (
-        <UserProfileDetailModal 
-          isOpen={!!selectedUser}
-          onClose={() => setSelectedUser(null)}
-          user={selectedUser}
-          currentUser={currentUser}
-          onEditProfile={(u) => {
-              setSelectedUser(null);
-              onEditUser(u);
-          }}
-          tasks={tasks}
-          meetings={meetings}
-          activeClients={activeClients}
-          leads={leads}
-        />
-      )}
     </div>
   );
 };

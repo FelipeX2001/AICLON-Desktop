@@ -16,6 +16,8 @@ interface DashboardLayoutProps {
   onNavigate: (view: any) => void;
   currentView: string;
   onEditProfile: () => void;
+  onViewMyTasks: () => void;
+  onViewMyMeetings: () => void;
   notifications?: Notification[];
   onMarkNotificationRead?: (id: string) => void;
 }
@@ -41,6 +43,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   onNavigate,
   currentView,
   onEditProfile,
+  onViewMyTasks,
+  onViewMyMeetings,
   notifications = [],
   onMarkNotificationRead
 }) => {
@@ -219,7 +223,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   <div className="fixed inset-0 z-10" onClick={() => setIsUserMenuOpen(false)} />
                   <div className="absolute right-0 mt-2 w-48 bg-night border border-border-subtle rounded-xl shadow-depth z-20 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2">
                     <button onClick={() => { setIsUserMenuOpen(false); onEditProfile(); }} className="w-full text-left px-4 py-3 text-sm text-mist hover:bg-surface-med hover:text-neon flex items-center transition-colors"><UserIcon size={16} className="mr-2" /> Editar Perfil</button>
-                    <div className="h-1 w-full bg-border-subtle my-1"></div>
+                    <div className="h-[1px] w-full bg-border-subtle my-1"></div>
+                    <button onClick={() => { setIsUserMenuOpen(false); onViewMyTasks(); }} className="w-full text-left px-4 py-3 text-sm text-mist hover:bg-surface-med hover:text-neon flex items-center transition-colors"><CheckSquare size={16} className="mr-2" /> Ver mis Tareas</button>
+                    <button onClick={() => { setIsUserMenuOpen(false); onViewMyMeetings(); }} className="w-full text-left px-4 py-3 text-sm text-mist hover:bg-surface-med hover:text-neon flex items-center transition-colors"><Calendar size={16} className="mr-2" /> Ver mis Reuniones</button>
+                    <div className="h-[1px] w-full bg-border-subtle my-1"></div>
                     <button onClick={() => { setIsUserMenuOpen(false); onLogout(); }} className="w-full text-left px-4 py-3 text-sm text-mist hover:bg-neon-orange/10 hover:text-neon-orange flex items-center transition-colors"><LogOut size={16} className="mr-2" /> Cerrar Sesión</button>
                   </div>
                 </>
