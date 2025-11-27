@@ -94,7 +94,15 @@ Deployment configured with autoscale:
 - Production port: 5000 (configurable via PORT env variable)
 - Backend runs compiled JavaScript (no ts-node overhead) for faster startup
 
-## Recent Changes (Nov 26, 2025)
+## Recent Changes (Nov 27, 2025)
+- **Complete localStorage elimination**: All data now persists through PostgreSQL API
+- **Lifted state pattern**: App.tsx is now single source of truth for all application state
+- **Component refactoring**: TaskBoard, MeetingsView, LeadBoard, ActiveClientsBoard, BotVersionsView, TutorialsView, DashboardHome all use props + callbacks
+- **New API endpoints**: dropped_clients, demos tables and routes added
+- **Real-time updates**: All CRUD operations go through centralized state in App.tsx
+- Only localStorage usage remaining: theme preference (aiclon_theme)
+
+## Previous Changes (Nov 26, 2025)
 - Integrated NeonDB PostgreSQL database for secure data persistence
 - Built Express backend API with authentication endpoints
 - Migrated authentication system from localStorage to database with bcrypt
