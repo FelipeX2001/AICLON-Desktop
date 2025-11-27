@@ -180,7 +180,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 {isNotifOpen && (
                     <>
                     <div className="fixed inset-0 z-10" onClick={() => setIsNotifOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-80 bg-night border border-border-subtle rounded-xl shadow-depth z-20 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                    <div className="fixed sm:absolute right-2 sm:right-0 left-2 sm:left-auto top-20 sm:top-auto sm:mt-2 w-auto sm:w-80 bg-night border border-border-subtle rounded-xl shadow-depth z-20 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2">
                         <div className="px-4 py-2 border-b border-border-subtle flex justify-between items-center">
                             <h4 className="text-xs font-bold uppercase text-mist">Notificaciones</h4>
                             {unreadCount > 0 && <span className="text-[10px] text-neon-orange">{unreadCount} nuevas</span>}

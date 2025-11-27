@@ -129,7 +129,7 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
             return (
               <div 
                 key={stage}
-                className="w-96 flex flex-col bg-surface-low/50 border border-border-subtle rounded-xl overflow-hidden"
+                className="w-80 flex flex-col bg-surface-low/50 border border-border-subtle rounded-xl overflow-hidden"
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, stage)}
               >

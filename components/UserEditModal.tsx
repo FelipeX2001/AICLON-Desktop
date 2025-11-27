@@ -70,7 +70,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
              <div className="w-full">
                  <ImageUploadField 
                     label="Cambiar Foto"
-                    value="" 
+                    value={formData.avatarUrl || ''} 
                     onChange={(url) => setFormData({...formData, avatarUrl: url})}
                     className="text-center"
                  />

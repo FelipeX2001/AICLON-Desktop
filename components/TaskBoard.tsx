@@ -138,9 +138,13 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users, tasks, onSaveTask, o
 
       <div 
         ref={scrollContainerRef}
-        className="flex-1 overflow-hidden pb-4"
+        className="flex-1 overflow-x-auto pb-4 cursor-grab active:cursor-grabbing select-none"
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
       >
-        <div className="grid grid-cols-4 gap-4 h-full px-1">
+        <div className="flex h-full space-x-4 min-w-max px-1">
           {Object.values(TaskStatus).map((status) => {
             const statusTasks = tasks.filter(t => t.status === status && !t.isDeleted);
             const sortedStatusTasks = getSortedTasks(statusTasks);
@@ -148,7 +152,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ user, users, tasks, onSaveTask, o
             return (
               <div 
                 key={status}
-                className="flex flex-col bg-surface-low/50 border border-border-subtle rounded-xl overflow-hidden min-w-0"
+                className="w-80 flex flex-col bg-surface-low/50 border border-border-subtle rounded-xl overflow-hidden"
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, status)}
               >
