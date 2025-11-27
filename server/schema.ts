@@ -58,7 +58,7 @@ export const meetings = pgTable('meetings', {
   startTime: varchar('start_time', { length: 50 }).notNull(),
   endTime: varchar('end_time', { length: 50 }).notNull(),
   attendeeIds: jsonb('attendee_ids').notNull().$type<number[]>(),
-  clientId: serial('client_id'),
+  clientId: integer('client_id'),
   link: text('link'),
   isRemote: boolean('is_remote').default(false),
   isDeleted: boolean('is_deleted').default(false),
@@ -157,6 +157,12 @@ export const tutorials = pgTable('tutorials', {
     type: 'image' | 'video' | 'video_link';
     url: string;
     name?: string;
+  }>>(),
+  steps: jsonb('steps').$type<Array<{
+    id: string;
+    title: string;
+    content: string;
+    order: number;
   }>>(),
   
   isDeleted: boolean('is_deleted').default(false),

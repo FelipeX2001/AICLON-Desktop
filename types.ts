@@ -233,6 +233,13 @@ export interface TutorialMedia {
   name?: string;
 }
 
+export interface TutorialStep {
+  id: string;
+  title: string;
+  content: string;
+  order: number;
+}
+
 export interface Tutorial extends BaseEntity {
   id: string;
   title: string;
@@ -240,4 +247,5 @@ export interface Tutorial extends BaseEntity {
   description: string;
   link: string;
   media: TutorialMedia[];
+  steps?: TutorialStep[];
 }
