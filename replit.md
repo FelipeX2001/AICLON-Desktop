@@ -68,6 +68,22 @@ A CRM-style desktop application for managing:
 - **Styling**: Tailwind CSS (via CDN)
 - **Icons**: Lucide React
 
+## Official Brand Color Palette
+```
+#F7FBFF - Light/White (backgrounds, light text)
+#00C8FF - Cyan Primary (main accent, completed states, highlights)
+#005AB7 - Blue Primary (secondary accent, gradients end)
+#F06000 - Orange (details, warnings, special accents)
+#040308 - Black/Dark (backgrounds, dark mode base)
+```
+
+**Usage Guidelines:**
+- Primary colors: Cyan (#00C8FF) and Blue (#005AB7)
+- Gradients: Use from cyan to blue (from-[#00C8FF] to-[#005AB7])
+- Orange (#F06000): For details and special accents only
+- Completed/success states: Use cyan (#00C8FF), NOT green
+- Dark backgrounds: Use #040308 or similar dark tones
+
 ## Environment Variables
 - `DATABASE_URL`: PostgreSQL connection string (auto-configured by Replit)
 - `GEMINI_API_KEY`: API key for Gemini AI features (stored as secret)

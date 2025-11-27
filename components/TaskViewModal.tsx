@@ -38,7 +38,7 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
       case TaskStatus.Pending: return 'bg-gray-500/20 text-gray-300';
       case TaskStatus.InProcess: return 'bg-blue-500/20 text-blue-300';
       case TaskStatus.InReview: return 'bg-purple-500/20 text-purple-300';
-      case TaskStatus.Completed: return 'bg-green-500/20 text-green-300';
+      case TaskStatus.Completed: return 'bg-[#00C8FF]/20 text-[#00C8FF]';
       default: return 'bg-surface-low text-mist';
     }
   };
@@ -173,12 +173,12 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
                     onClick={() => handleSubtaskClick(subtask)}
                     className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
                       subtask.completed 
-                        ? 'bg-green-500/10 border-green-500/30 hover:bg-green-500/20' 
+                        ? 'bg-[#00C8FF]/10 border-[#00C8FF]/30 hover:bg-[#00C8FF]/20' 
                         : 'bg-surface-low/50 border-border-subtle hover:border-neon/50'
                     }`}
                   >
                     {subtask.completed ? (
-                      <CheckSquare size={18} className="text-green-400 flex-shrink-0" />
+                      <CheckSquare size={18} className="text-[#00C8FF] flex-shrink-0" />
                     ) : (
                       <Square size={18} className="text-mist-muted flex-shrink-0" />
                     )}
