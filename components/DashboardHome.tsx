@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import { User, Task, MeetingEvent, Demo, TaskStatus } from '../types';
-import { Clock, Users, Plus, Edit2, Bot } from 'lucide-react';
+import { User, Task, MeetingEvent, Demo, TaskStatus, TaskPriority } from '../types';
+import { Clock, Users, Plus, Edit2, Bot, X, Building2, Calendar, AlertTriangle, User as UserIcon } from 'lucide-react';
 
 interface DashboardHomeProps {
   user: User;
+  users: User[];
   tasks: Task[];
   meetings: MeetingEvent[];
   demos: Demo[];
@@ -25,7 +26,7 @@ const shortcuts = [
   { id: '10', label: 'Gemini', iconType: 'ai', url: 'https://gemini.google.com', imageUrl: 'https://www.google.com/s2/favicons?domain=gemini.google.com&sz=128' },
 ];
 
-const DashboardHome: React.FC<DashboardHomeProps> = ({ user, tasks = [], meetings = [], demos = [], onSaveDemo, onDeleteDemo }) => {
+const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks = [], meetings = [], demos = [], onSaveDemo, onDeleteDemo }) => {
   const today = new Date().toISOString().split('T')[0];
   
   const myTasksToday = tasks.filter(t => 
@@ -45,6 +46,18 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, tasks = [], meeting
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [currentDemo, setCurrentDemo] = useState<Partial<Demo>>({});
   const [isEditing, setIsEditing] = useState(false);
+
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  const getPriorityColor = (p: TaskPriority) => {
+    switch (p) {
+      case TaskPriority.Urgent: return 'text-red-500 bg-red-500/10 border-red-500/30';
+      case TaskPriority.High: return 'text-neon-orange bg-neon-orange/10 border-neon-orange/30';
+      case TaskPriority.Medium: return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30';
+      case TaskPriority.Low: return 'text-blue-400 bg-blue-400/10 border-blue-400/30';
+      default: return 'text-mist-muted';
+    }
+  };
 
   const handleOpenNewDemo = () => { 
     setCurrentDemo({ name: '', number: '', client: '', url: '' }); 
@@ -99,7 +112,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, tasks = [], meeting
           <div className="space-y-4">
             <h4 className="text-sm font-bold uppercase text-mist-muted tracking-wider mb-2 border-b border-border-subtle pb-2">Tareas para Hoy</h4>
             {myTasksToday.length === 0 ? <p className="text-xs text-mist-faint italic">Todo al día.</p> : myTasksToday.map(task => (
-              <div key={task.id} className="p-4 rounded-lg bg-surface-low border border-border-subtle hover:border-neon/30 transition-colors">
+              <div 
+                key={task.id} 
+                onClick={() => setSelectedTask(task)}
+                className="p-4 rounded-lg bg-surface-low border border-border-subtle hover:border-neon/30 transition-colors cursor-pointer"
+              >
                 <div className="flex justify-between items-start mb-2"><span className="text-base font-medium text-mist truncate pr-2">{task.title}</span></div>
                 <div className="flex justify-between items-center"><p className="text-xs text-mist-muted font-semibold">{task.clientName}</p><span className="text-[10px] px-2 py-1 rounded bg-neon-blue/20 text-mist-muted whitespace-nowrap border border-neon-blue/20">{task.deadline}</span></div>
               </div>
@@ -181,6 +198,82 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, tasks = [], meeting
             <p className="text-mist mb-4">¿Eliminar definitivamente?</p>
             <button onClick={handleConfirmDelete} className="bg-neon-orange text-white px-4 py-2 rounded font-bold">Sí, Eliminar</button>
             <button onClick={() => setIsDeleteConfirmOpen(false)} className="ml-2 text-mist">Cancelar</button>
+          </div>
+        </div>
+      )}
+
+      {selectedTask && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-night border border-border-subtle rounded-xl w-full max-w-lg shadow-depth overflow-hidden">
+            <div className="p-4 border-b border-border-subtle flex justify-between items-center bg-surface-low">
+              <h3 className="text-lg font-designer text-mist uppercase tracking-wide">Detalle de Tarea</h3>
+              <button onClick={() => setSelectedTask(null)} className="text-mist-muted hover:text-mist"><X size={20} /></button>
+            </div>
+            
+            {selectedTask.coverUrl && (
+              <div className="h-40 w-full relative">
+                <img src={selectedTask.coverUrl} alt="Cover" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-night via-transparent to-transparent" />
+              </div>
+            )}
+            
+            <div className="p-6 space-y-5">
+              <div className="flex items-start justify-between gap-4">
+                <h2 className="text-2xl font-bold text-mist leading-tight">{selectedTask.title}</h2>
+                <span className={`text-xs uppercase font-bold px-3 py-1 rounded border whitespace-nowrap ${getPriorityColor(selectedTask.priority)}`}>
+                  {selectedTask.priority}
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-surface-low rounded-lg p-3 border border-border-subtle">
+                  <p className="text-[10px] uppercase font-bold text-mist-muted mb-1 flex items-center"><Building2 size={12} className="mr-1" /> Cliente</p>
+                  <p className="text-sm text-mist font-medium">{selectedTask.clientName}</p>
+                </div>
+                <div className="bg-surface-low rounded-lg p-3 border border-border-subtle">
+                  <p className="text-[10px] uppercase font-bold text-mist-muted mb-1 flex items-center"><Calendar size={12} className="mr-1" /> Fecha Límite</p>
+                  <p className="text-sm text-mist font-mono">{selectedTask.deadline}</p>
+                </div>
+                <div className="bg-surface-low rounded-lg p-3 border border-border-subtle">
+                  <p className="text-[10px] uppercase font-bold text-mist-muted mb-1 flex items-center"><AlertTriangle size={12} className="mr-1" /> Estado</p>
+                  <p className="text-sm text-neon font-medium">{selectedTask.status}</p>
+                </div>
+                <div className="bg-surface-low rounded-lg p-3 border border-border-subtle">
+                  <p className="text-[10px] uppercase font-bold text-mist-muted mb-1 flex items-center"><UserIcon size={12} className="mr-1" /> Encargado</p>
+                  <div className="flex items-center">
+                    {(() => {
+                      const assignee = users.find(u => u.id === selectedTask.assigneeId);
+                      return assignee ? (
+                        <>
+                          <img src={assignee.avatarUrl} alt={assignee.name} className="w-5 h-5 rounded-full border border-border-subtle object-cover mr-2" />
+                          <span className="text-sm text-mist">{assignee.name}</span>
+                        </>
+                      ) : <span className="text-sm text-mist-muted">Sin asignar</span>;
+                    })()}
+                  </div>
+                </div>
+              </div>
+
+              {selectedTask.description && (
+                <div className="bg-surface-low rounded-lg p-4 border border-border-subtle">
+                  <p className="text-[10px] uppercase font-bold text-mist-muted mb-2">Descripción</p>
+                  <p className="text-sm text-mist whitespace-pre-wrap">{selectedTask.description}</p>
+                </div>
+              )}
+
+              {selectedTask.comments && (
+                <div className="bg-surface-low rounded-lg p-4 border border-neon-orange/30">
+                  <p className="text-[10px] uppercase font-bold text-neon-orange mb-2">Comentarios</p>
+                  <p className="text-sm text-mist whitespace-pre-wrap">{selectedTask.comments}</p>
+                </div>
+              )}
+
+              <div className="pt-2 flex justify-end">
+                <button onClick={() => setSelectedTask(null)} className="px-6 py-2 rounded bg-gradient-primary text-mist text-sm font-bold shadow-neon-glow hover:brightness-110 transition-all">
+                  Cerrar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

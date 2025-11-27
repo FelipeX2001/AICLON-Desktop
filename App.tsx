@@ -764,7 +764,8 @@ const App: React.FC = () => {
       case 'dashboard':
         return (
           <DashboardHome 
-            user={currentUser!} 
+            user={currentUser!}
+            users={validUsers}
             tasks={validTasks} 
             meetings={validMeetings}
             demos={validDemos}
@@ -855,7 +856,8 @@ const App: React.FC = () => {
       default:
         return (
           <DashboardHome 
-            user={currentUser!} 
+            user={currentUser!}
+            users={validUsers}
             tasks={validTasks} 
             meetings={validMeetings}
             demos={validDemos}
