@@ -18,9 +18,9 @@ interface DashboardHomeProps {
 }
 
 const shortcuts = [
-  { id: '1', label: 'API', iconType: 'api', url: 'https://api.aiclon.io', imageUrl: 'https://www.google.com/s2/favicons?domain=api.aiclon.io&sz=128' },
+  { id: '1', label: 'API', iconType: 'api', url: 'https://api.aiclon.io', imageUrl: '/images/logos faltantes/ISOTIPO BLANCO.png' },
   { id: '2', label: 'Replit', iconType: 'code', url: 'https://replit.com', imageUrl: 'https://www.google.com/s2/favicons?domain=replit.com&sz=128' },
-  { id: '3', label: 'Admin Chats', iconType: 'chat', url: 'https://api.aiclon.io', imageUrl: 'https://www.google.com/s2/favicons?domain=api.aiclon.io&sz=128' },
+  { id: '3', label: 'Admin Chats', iconType: 'chat', url: 'https://api.aiclon.io', imageUrl: '/images/logos faltantes/ISOTIPO CELESTE.png' },
   { id: '4', label: 'Coolify', iconType: 'cloud', url: 'https://app.coolify.io', imageUrl: 'https://www.google.com/s2/favicons?domain=coolify.io&sz=128' },
   { id: '5', label: 'Evolution', iconType: 'bot', url: 'http://3.83.151.37:8080/manager', imageUrl: '/images/logos faltantes/evolution-logo.png' },
   { id: '6', label: 'Appwrite', iconType: 'db', url: 'https://appwrite.aiclon.io/console/organization-aiclon', imageUrl: 'https://www.google.com/s2/favicons?domain=appwrite.io&sz=128' },
