@@ -27,6 +27,7 @@ const VIEW_TITLES: Record<string, string> = {
   'tasks': 'Tareas',
   'meetings': 'Reuniones',
   'team': 'Equipo',
+  'user-profile': 'Perfil de Usuario',
   'bot-versions': 'Bot versions',
   'tutorials': 'Tutoriales',
   'clients-general': 'Todos',
