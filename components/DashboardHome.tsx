@@ -1,142 +1,134 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { User, Task, MeetingEvent, Demo, TaskStatus } from '../types';
-import { Clock, Users, Plus, Edit2, Bot, Server, Terminal, MessageSquare, Cloud, Database, Network, Mic, Sparkles, ExternalLink, Copy, Check, Trash2, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Clock, Users, Plus, Edit2, Bot } from 'lucide-react';
 
 interface DashboardHomeProps {
   user: User;
-  tasks: Task[]; // Global Tasks
-  meetings: MeetingEvent[]; // Global Meetings
+  tasks: Task[];
+  meetings: MeetingEvent[];
+  demos: Demo[];
+  onSaveDemo: (demo: Demo) => void;
+  onDeleteDemo: (demoId: string) => void;
 }
 
-// ... (Mock Quick Links & DEFAULT_DEMOS kept for brevity, assume same as before) ...
 const shortcuts = [
-    { id: '1', label: 'API', iconType: 'api', url: 'https://api.aiclon.io', imageUrl: 'https://www.google.com/s2/favicons?domain=aiclon.io&sz=128' },
-    { id: '2', label: 'Replit', iconType: 'code', url: 'https://replit.com', imageUrl: 'https://www.google.com/s2/favicons?domain=replit.com&sz=128' },
-    { id: '3', label: 'Admin Chats', iconType: 'chat', url: 'https://api.aiclon.io', imageUrl: 'https://www.google.com/s2/favicons?domain=aiclon.io&sz=128' },
-    { id: '4', label: 'Coolify', iconType: 'cloud', url: 'https://app.coolify.io', imageUrl: 'https://www.google.com/s2/favicons?domain=coolify.io&sz=128' },
-    { id: '5', label: 'Evolution', iconType: 'bot', url: 'http://3.83.151.37:8080/manager', imageUrl: 'https://avatars.githubusercontent.com/u/155099025?s=200&v=4' },
-    { id: '6', label: 'Appwrite', iconType: 'db', url: 'https://appwrite.aiclon.io/console/organization-aiclon', imageUrl: 'https://www.google.com/s2/favicons?domain=appwrite.io&sz=128' },
-    { id: '7', label: 'Open Router', iconType: 'network', url: 'https://openrouter.ai', imageUrl: 'https://www.google.com/s2/favicons?domain=openrouter.ai&sz=128' },
-    { id: '8', label: 'ElevenLabs', iconType: 'audio', url: 'https://elevenlabs.io', imageUrl: 'https://www.google.com/s2/favicons?domain=elevenlabs.io&sz=128' },
-    { id: '9', label: 'Chat GPT', iconType: 'ai', url: 'https://chatgpt.com', imageUrl: 'https://www.google.com/s2/favicons?domain=openai.com&sz=128' },
-    { id: '10', label: 'Gemini', iconType: 'ai', url: 'https://gemini.google.com', imageUrl: 'https://www.google.com/s2/favicons?domain=gemini.google.com&sz=128' },
+  { id: '1', label: 'API', iconType: 'api', url: 'https://api.aiclon.io', imageUrl: 'https://www.google.com/s2/favicons?domain=aiclon.io&sz=128' },
+  { id: '2', label: 'Replit', iconType: 'code', url: 'https://replit.com', imageUrl: 'https://www.google.com/s2/favicons?domain=replit.com&sz=128' },
+  { id: '3', label: 'Admin Chats', iconType: 'chat', url: 'https://api.aiclon.io', imageUrl: 'https://www.google.com/s2/favicons?domain=aiclon.io&sz=128' },
+  { id: '4', label: 'Coolify', iconType: 'cloud', url: 'https://app.coolify.io', imageUrl: 'https://www.google.com/s2/favicons?domain=coolify.io&sz=128' },
+  { id: '5', label: 'Evolution', iconType: 'bot', url: 'http://3.83.151.37:8080/manager', imageUrl: 'https://avatars.githubusercontent.com/u/155099025?s=200&v=4' },
+  { id: '6', label: 'Appwrite', iconType: 'db', url: 'https://appwrite.aiclon.io/console/organization-aiclon', imageUrl: 'https://www.google.com/s2/favicons?domain=appwrite.io&sz=128' },
+  { id: '7', label: 'Open Router', iconType: 'network', url: 'https://openrouter.ai', imageUrl: 'https://www.google.com/s2/favicons?domain=openrouter.ai&sz=128' },
+  { id: '8', label: 'ElevenLabs', iconType: 'audio', url: 'https://elevenlabs.io', imageUrl: 'https://www.google.com/s2/favicons?domain=elevenlabs.io&sz=128' },
+  { id: '9', label: 'Chat GPT', iconType: 'ai', url: 'https://chatgpt.com', imageUrl: 'https://www.google.com/s2/favicons?domain=openai.com&sz=128' },
+  { id: '10', label: 'Gemini', iconType: 'ai', url: 'https://gemini.google.com', imageUrl: 'https://www.google.com/s2/favicons?domain=gemini.google.com&sz=128' },
 ];
 
-const DEFAULT_DEMOS: Demo[] = [
-    { id: '1', number: '573243990795', name: 'Demo 1 (META)', client: 'Witnam Inmobiliaria', url: 'demo1.aiclon.io' },
-    { id: '2', number: '573243990828', name: 'DEMO 2 (META)', client: 'GCA', url: 'demo2.aiclon.io' },
-    { id: '3', number: '573116148188', name: 'Demo Felipe', client: 'COBRANZA LOS PATIOS', url: 'demo3.aiclon.io' },
-    { id: '4', number: '573217375994', name: 'Demo 4', client: 'DMODA', url: 'demo4.aiclon.io' },
-    { id: '5', number: '573170854194', name: 'Demo 5', client: 'Gaemcol', url: 'demo5.aiclon.io' },
-    { id: '6', number: '573006675856', name: 'Demo 6', client: 'Consignación Los Lancheros', url: 'demo6.aiclon.io' },
-    { id: '7', number: '573206812258', name: 'Demo 7', client: 'Tsunami Effect', url: 'demo7.aiclon.io' },
-];
-
-const DashboardHome: React.FC<DashboardHomeProps> = ({ user, tasks = [], meetings = [] }) => {
-  // Filter Data for "My Day"
+const DashboardHome: React.FC<DashboardHomeProps> = ({ user, tasks = [], meetings = [], demos = [], onSaveDemo, onDeleteDemo }) => {
   const today = new Date().toISOString().split('T')[0];
   
   const myTasksToday = tasks.filter(t => 
-      !t.isDeleted &&
-      t.assigneeId === user.id &&
-      t.deadline === today &&
-      t.status !== TaskStatus.Completed
+    !t.isDeleted &&
+    t.assigneeId === user.id &&
+    t.deadline === today &&
+    t.status !== TaskStatus.Completed
   );
 
   const myMeetingsToday = meetings.filter(m => 
-      !m.isDeleted &&
-      m.attendeeIds.includes(user.id) &&
-      m.date === today
+    !m.isDeleted &&
+    m.attendeeIds.includes(user.id) &&
+    m.date === today
   ).sort((a, b) => a.startTime.localeCompare(b.startTime));
-
-  // Demo State (Kept internal as it's a separate module)
-  const [demos, setDemos] = useState<Demo[]>(() => {
-    try {
-      const saved = localStorage.getItem('aiclon_demos');
-      return saved ? JSON.parse(saved) : DEFAULT_DEMOS;
-    } catch { return DEFAULT_DEMOS; }
-  });
-  
-  useEffect(() => localStorage.setItem('aiclon_demos', JSON.stringify(demos)), [demos]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [currentDemo, setCurrentDemo] = useState<Partial<Demo>>({});
   const [isEditing, setIsEditing] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // ... (Handlers for Demos: handleSaveDemo, handleDeleteDemo, handleCopyUrl - Same as before) ...
-  const handleOpenNewDemo = () => { setCurrentDemo({ name: '', number: '', client: '', url: '' }); setIsEditing(false); setIsModalOpen(true); };
-  const handleOpenEditDemo = (demo: Demo) => { setCurrentDemo({ ...demo }); setIsEditing(true); setIsModalOpen(true); };
+  const handleOpenNewDemo = () => { 
+    setCurrentDemo({ name: '', number: '', client: '', url: '' }); 
+    setIsEditing(false); 
+    setIsModalOpen(true); 
+  };
+  
+  const handleOpenEditDemo = (demo: Demo) => { 
+    setCurrentDemo({ ...demo }); 
+    setIsEditing(true); 
+    setIsModalOpen(true); 
+  };
+  
   const handleSaveDemo = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isEditing && currentDemo.id) { setDemos(prev => prev.map(d => d.id === currentDemo.id ? currentDemo as Demo : d)); } 
-    else { setDemos(prev => [...prev, { ...currentDemo, id: Date.now().toString() } as Demo]); }
+    if (isEditing && currentDemo.id) { 
+      onSaveDemo(currentDemo as Demo); 
+    } else { 
+      onSaveDemo({ ...currentDemo, id: Date.now().toString() } as Demo); 
+    }
     setIsModalOpen(false);
   };
-  const handleConfirmDelete = () => { if (currentDemo.id) { setDemos(prev => prev.filter(d => d.id !== currentDemo.id)); setIsDeleteConfirmOpen(false); setIsModalOpen(false); } };
-  const handleCopyDeleteThreadUrl = (url: string, id: string) => {
-    const cleanUrl = url.replace(/(^\w+:|^)\/\//, '');
-    navigator.clipboard.writeText(`https://${cleanUrl}/v1/deleteThread`).then(() => { setCopiedId(id); setTimeout(() => setCopiedId(null), 2000); });
+  
+  const handleConfirmDelete = () => { 
+    if (currentDemo.id) { 
+      onDeleteDemo(currentDemo.id); 
+      setIsDeleteConfirmOpen(false); 
+      setIsModalOpen(false); 
+    } 
   };
+
+  const validDemos = demos.filter(d => !d.isDeleted);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
-      {/* Greeting */}
       <div className="bg-surface-low border border-border-subtle rounded-2xl p-8 flex flex-col items-center text-center shadow-lg relative overflow-hidden group">
-         <div className="absolute top-0 right-0 w-64 h-64 bg-neon/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none group-hover:bg-neon/10 transition-colors duration-500"></div>
-         <div className="relative z-10 w-full mb-8">
-            <h2 className="text-5xl md:text-7xl font-designer text-mist mb-4 tracking-wide">Bienvenido, {user.name.split(' ')[0]}</h2>
-            <p className="text-mist-muted text-xl">
-              Hoy tienes <span className="text-neon font-bold">{myTasksToday.length} tareas</span> y <span className="text-neon-orange font-bold">{myMeetingsToday.length} reuniones</span> pendientes.
-            </p>
-         </div>
-         <img src={user.avatarUrl} alt={user.name} className="w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-neon/50 p-1 shadow-[0_0_40px_rgba(0,200,255,0.4)] object-cover transform group-hover:scale-105 transition-transform duration-500"/>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-neon/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none group-hover:bg-neon/10 transition-colors duration-500"></div>
+        <div className="relative z-10 w-full mb-8">
+          <h2 className="text-5xl md:text-7xl font-designer text-mist mb-4 tracking-wide">Bienvenido, {user.name.split(' ')[0]}</h2>
+          <p className="text-mist-muted text-xl">
+            Hoy tienes <span className="text-neon font-bold">{myTasksToday.length} tareas</span> y <span className="text-neon-orange font-bold">{myMeetingsToday.length} reuniones</span> pendientes.
+          </p>
+        </div>
+        <img src={user.avatarUrl} alt={user.name} className="w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-neon/50 p-1 shadow-[0_0_40px_rgba(0,200,255,0.4)] object-cover transform group-hover:scale-105 transition-transform duration-500"/>
       </div>
 
-      {/* Diarias */}
       <div className="bg-surface-low border border-border-subtle rounded-2xl p-6 flex flex-col shadow-lg h-full">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-3xl font-designer text-mist flex items-center pt-1"><Clock size={28} className="text-neon mr-3" /> Diarias</h3>
         </div>
         <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {/* Tasks */}
           <div className="space-y-4">
-             <h4 className="text-sm font-bold uppercase text-mist-muted tracking-wider mb-2 border-b border-border-subtle pb-2">Tareas para Hoy</h4>
-             {myTasksToday.length === 0 ? <p className="text-xs text-mist-faint italic">Todo al día.</p> : myTasksToday.map(task => (
-               <div key={task.id} className="p-4 rounded-lg bg-surface-low border border-border-subtle hover:border-neon/30 transition-colors">
-                 <div className="flex justify-between items-start mb-2"><span className="text-base font-medium text-mist truncate pr-2">{task.title}</span></div>
-                 <div className="flex justify-between items-center"><p className="text-xs text-mist-muted font-semibold">{task.clientName}</p><span className="text-[10px] px-2 py-1 rounded bg-neon-blue/20 text-mist-muted whitespace-nowrap border border-neon-blue/20">{task.deadline}</span></div>
-               </div>
-             ))}
+            <h4 className="text-sm font-bold uppercase text-mist-muted tracking-wider mb-2 border-b border-border-subtle pb-2">Tareas para Hoy</h4>
+            {myTasksToday.length === 0 ? <p className="text-xs text-mist-faint italic">Todo al día.</p> : myTasksToday.map(task => (
+              <div key={task.id} className="p-4 rounded-lg bg-surface-low border border-border-subtle hover:border-neon/30 transition-colors">
+                <div className="flex justify-between items-start mb-2"><span className="text-base font-medium text-mist truncate pr-2">{task.title}</span></div>
+                <div className="flex justify-between items-center"><p className="text-xs text-mist-muted font-semibold">{task.clientName}</p><span className="text-[10px] px-2 py-1 rounded bg-neon-blue/20 text-mist-muted whitespace-nowrap border border-neon-blue/20">{task.deadline}</span></div>
+              </div>
+            ))}
           </div>
-          {/* Meetings */}
           <div className="space-y-4 relative sm:border-l sm:border-border-subtle sm:pl-6">
-             <h4 className="text-sm font-bold uppercase text-mist-muted tracking-wider mb-2 border-b border-border-subtle pb-2">Agenda Hoy</h4>
-             {myMeetingsToday.length === 0 ? <p className="text-xs text-mist-faint italic">Sin reuniones.</p> : myMeetingsToday.map(meeting => (
-               <div key={meeting.id} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-white/5 transition-colors">
-                 <div className="text-center min-w-[3.5rem] bg-surface-low rounded p-1 border border-border-subtle">
-                   <span className="block text-base font-bold text-neon">{meeting.startTime}</span>
-                 </div>
-                 <div className="pt-1">
-                   <p className="text-base font-medium text-mist">{meeting.title}</p>
-                   <p className="text-xs text-mist-muted mt-0.5 flex items-center"><Users size={12} className="mr-1"/> {meeting.attendeeIds.length} inv.</p>
-                 </div>
-               </div>
-             ))}
+            <h4 className="text-sm font-bold uppercase text-mist-muted tracking-wider mb-2 border-b border-border-subtle pb-2">Agenda Hoy</h4>
+            {myMeetingsToday.length === 0 ? <p className="text-xs text-mist-faint italic">Sin reuniones.</p> : myMeetingsToday.map(meeting => (
+              <div key={meeting.id} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-white/5 transition-colors">
+                <div className="text-center min-w-[3.5rem] bg-surface-low rounded p-1 border border-border-subtle">
+                  <span className="block text-base font-bold text-neon">{meeting.startTime}</span>
+                </div>
+                <div className="pt-1">
+                  <p className="text-base font-medium text-mist">{meeting.title}</p>
+                  <p className="text-xs text-mist-muted mt-0.5 flex items-center"><Users size={12} className="mr-1"/> {meeting.attendeeIds.length} inv.</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Shortcuts */}
       <div className="lg:col-span-2">
         <h3 className="text-xl font-montserrat font-bold text-mist mb-4 ml-1 border-l-4 border-neon pl-3">Atajos Rápidos</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {shortcuts.map(link => (
             <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-low border border-border-subtle hover:bg-surface-med hover:border-neon hover:shadow-neon-glow transition-all duration-300 group h-32">
               <div className="p-3 rounded-full bg-night border border-border-subtle group-hover:bg-neon/10 group-hover:border-neon mb-3 transition-colors relative overflow-hidden w-12 h-12 flex items-center justify-center">
-                 {link.imageUrl ? <img src={link.imageUrl} alt={link.label} className="w-full h-full object-contain" /> : <span>ICON</span>}
+                {link.imageUrl ? <img src={link.imageUrl} alt={link.label} className="w-full h-full object-contain" /> : <span>ICON</span>}
               </div>
               <span className="text-sm font-medium text-mist group-hover:text-neon text-center">{link.label}</span>
             </a>
@@ -144,7 +136,6 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, tasks = [], meeting
         </div>
       </div>
 
-      {/* Demos Table (Simplified for brevity, reusing logic) */}
       <div className="lg:col-span-2 bg-surface-low border border-border-subtle rounded-2xl overflow-hidden shadow-depth">
         <div className="p-6 border-b border-border-subtle flex justify-between items-center bg-night/30">
           <h3 className="text-3xl font-designer text-mist pt-1">Demos Activas</h3>
@@ -154,7 +145,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, tasks = [], meeting
           <table className="w-full text-left border-collapse">
             <thead><tr className="border-b border-border-subtle bg-night/50"><th className="p-4 text-xs font-semibold text-mist-muted uppercase">Demo</th><th className="p-4 text-xs font-semibold text-mist-muted uppercase">Nombre</th><th className="p-4 text-xs font-semibold text-mist-muted uppercase">Cliente</th><th className="p-4 text-xs font-semibold text-mist-muted uppercase">URL</th><th className="p-4 text-center">Editar</th></tr></thead>
             <tbody className="divide-y divide-border-subtle">
-              {demos.map((demo) => (
+              {validDemos.map((demo) => (
                 <tr key={demo.id} className="hover:bg-surface-med transition-colors">
                   <td className="p-4 text-center"><Bot size={16} className="text-neon mx-auto" /></td>
                   <td className="p-4 text-sm font-bold text-mist">{demo.name}</td>
@@ -168,31 +159,30 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, tasks = [], meeting
         </div>
       </div>
       
-      {/* Edit Demo Modal and Delete Confirmation (Keeping existing structure logic) */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="bg-night border border-border-subtle rounded-xl w-full max-w-md p-6">
-                {/* ... Simplified for brevity, same fields as before ... */}
-                <h3 className="text-xl text-mist mb-4">{isEditing ? 'Editar Demo' : 'Nueva Demo'}</h3>
-                <input className="w-full bg-surface-low border border-border-subtle p-2 rounded mb-2 text-mist" placeholder="Nombre" value={currentDemo.name} onChange={e=>setCurrentDemo({...currentDemo, name: e.target.value})} />
-                <input className="w-full bg-surface-low border border-border-subtle p-2 rounded mb-2 text-mist" placeholder="Cliente" value={currentDemo.client} onChange={e=>setCurrentDemo({...currentDemo, client: e.target.value})} />
-                <input className="w-full bg-surface-low border border-border-subtle p-2 rounded mb-4 text-mist" placeholder="URL" value={currentDemo.url} onChange={e=>setCurrentDemo({...currentDemo, url: e.target.value})} />
-                <div className="flex justify-end space-x-2">
-                    {isEditing && <button onClick={() => setIsDeleteConfirmOpen(true)} className="px-4 py-2 text-neon-orange border border-neon-orange rounded">Eliminar</button>}
-                    <button onClick={handleSaveDemo} className="px-4 py-2 bg-neon text-night font-bold rounded">Guardar</button>
-                </div>
+          <div className="bg-night border border-border-subtle rounded-xl w-full max-w-md p-6">
+            <h3 className="text-xl text-mist mb-4">{isEditing ? 'Editar Demo' : 'Nueva Demo'}</h3>
+            <input className="w-full bg-surface-low border border-border-subtle p-2 rounded mb-2 text-mist" placeholder="Nombre" value={currentDemo.name || ''} onChange={e=>setCurrentDemo({...currentDemo, name: e.target.value})} />
+            <input className="w-full bg-surface-low border border-border-subtle p-2 rounded mb-2 text-mist" placeholder="Cliente" value={currentDemo.client || ''} onChange={e=>setCurrentDemo({...currentDemo, client: e.target.value})} />
+            <input className="w-full bg-surface-low border border-border-subtle p-2 rounded mb-4 text-mist" placeholder="URL" value={currentDemo.url || ''} onChange={e=>setCurrentDemo({...currentDemo, url: e.target.value})} />
+            <div className="flex justify-end space-x-2">
+              <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-mist-muted">Cancelar</button>
+              {isEditing && <button onClick={() => setIsDeleteConfirmOpen(true)} className="px-4 py-2 text-neon-orange border border-neon-orange rounded">Eliminar</button>}
+              <button onClick={handleSaveDemo} className="px-4 py-2 bg-neon text-night font-bold rounded">Guardar</button>
             </div>
+          </div>
         </div>
       )}
       
       {isDeleteConfirmOpen && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90">
-              <div className="bg-night border border-neon-orange p-6 rounded-xl text-center">
-                  <p className="text-mist mb-4">¿Eliminar definitivamente?</p>
-                  <button onClick={handleConfirmDelete} className="bg-neon-orange text-white px-4 py-2 rounded font-bold">Sí, Eliminar</button>
-                  <button onClick={() => setIsDeleteConfirmOpen(false)} className="ml-2 text-mist">Cancelar</button>
-              </div>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90">
+          <div className="bg-night border border-neon-orange p-6 rounded-xl text-center">
+            <p className="text-mist mb-4">¿Eliminar definitivamente?</p>
+            <button onClick={handleConfirmDelete} className="bg-neon-orange text-white px-4 py-2 rounded font-bold">Sí, Eliminar</button>
+            <button onClick={() => setIsDeleteConfirmOpen(false)} className="ml-2 text-mist">Cancelar</button>
           </div>
+        </div>
       )}
     </div>
   );
