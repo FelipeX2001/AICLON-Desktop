@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { ActiveClient, ACTIVE_CLIENT_STAGES, ActiveClientStage, DroppedClient, User, Lead } from '../types';
 import ActiveClientModal from './ActiveClientModal';
+import ActiveClientViewModal from './ActiveClientViewModal';
 import { GripVertical, Building2, Clock, CheckSquare, User as UserIcon } from 'lucide-react';
 
 interface ActiveClientsBoardProps {
@@ -25,8 +26,10 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
   onDeleteActiveClient,
   onSaveDroppedClient
 }) => {
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [clientToEdit, setClientToEdit] = useState<ActiveClient | null>(null);
+  const [clientToView, setClientToView] = useState<ActiveClient | null>(null);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isDraggingScroll = useRef(false);
@@ -60,9 +63,22 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
     setClientToEdit(null);
   };
 
+  const openViewModal = (client: ActiveClient) => {
+    setClientToView(client);
+    setIsViewModalOpen(true);
+  };
+
   const openEditModal = (client: ActiveClient) => {
     setClientToEdit(client);
     setIsModalOpen(true);
+  };
+
+  const handleEditFromView = () => {
+    if (clientToView) {
+      setClientToEdit(clientToView);
+      setIsViewModalOpen(false);
+      setIsModalOpen(true);
+    }
   };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
@@ -148,7 +164,7 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
                       key={client.activeId}
                       draggable
                       onDragStart={(e) => handleDragStart(e, client.activeId)}
-                      onClick={() => openEditModal(client)}
+                      onClick={() => openViewModal(client)}
                       className="client-card bg-night border border-border-subtle rounded-lg hover:border-neon/50 hover:shadow-card-glow transition-all group relative flex flex-col overflow-hidden cursor-pointer"
                     >
                       {client.coverUrl && (
@@ -219,6 +235,16 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
           })}
         </div>
       </div>
+
+      {clientToView && (
+        <ActiveClientViewModal
+          isOpen={isViewModalOpen}
+          onClose={() => { setIsViewModalOpen(false); setClientToView(null); }}
+          client={clientToView}
+          users={users || []}
+          onEdit={handleEditFromView}
+        />
+      )}
 
       <ActiveClientModal 
         isOpen={isModalOpen}

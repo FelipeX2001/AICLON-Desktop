@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { BotVersion, BotType, User } from '../types';
 import { Plus, Bot, Calendar, Edit, X } from 'lucide-react';
 import BotVersionModal from './BotVersionModal';
+import BotVersionViewModal from './BotVersionViewModal';
 import ImageUploadField from './ImageUploadField';
 
 interface BotVersionsViewProps {
@@ -24,9 +25,11 @@ const BotVersionsView: React.FC<BotVersionsViewProps> = ({
 }) => {
   const listCovers = botListCovers;
 
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentType, setCurrentType] = useState<BotType>('evolution');
   const [versionToEdit, setVersionToEdit] = useState<BotVersion | null>(null);
+  const [versionToView, setVersionToView] = useState<BotVersion | null>(null);
 
   const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
   const [coverTypeToEdit, setCoverTypeToEdit] = useState<BotType | null>(null);
@@ -50,10 +53,24 @@ const BotVersionsView: React.FC<BotVersionsViewProps> = ({
     setIsModalOpen(true);
   };
 
+  const openViewModal = (version: BotVersion) => {
+    setVersionToView(version);
+    setIsViewModalOpen(true);
+  };
+
   const openEditModal = (version: BotVersion) => {
     setCurrentType(version.type);
     setVersionToEdit(version);
     setIsModalOpen(true);
+  };
+
+  const handleEditFromView = () => {
+    if (versionToView) {
+      setCurrentType(versionToView.type);
+      setVersionToEdit(versionToView);
+      setIsViewModalOpen(false);
+      setIsModalOpen(true);
+    }
   };
 
   const openCoverEdit = (type: BotType) => {
@@ -131,7 +148,7 @@ const BotVersionsView: React.FC<BotVersionsViewProps> = ({
             typeVersions.map(version => (
               <div 
                 key={version.id}
-                onClick={() => openEditModal(version)}
+                onClick={() => openViewModal(version)}
                 className="bg-night border border-border-subtle rounded-lg p-4 hover:border-neon/50 hover:shadow-card-glow transition-all cursor-pointer group"
               >
                 <div className="flex justify-between items-start mb-1">
@@ -158,6 +175,15 @@ const BotVersionsView: React.FC<BotVersionsViewProps> = ({
           <BotList type="chatbot" title="Bot Chatbot" />
         </div>
       </div>
+
+      {versionToView && (
+        <BotVersionViewModal
+          isOpen={isViewModalOpen}
+          onClose={() => { setIsViewModalOpen(false); setVersionToView(null); }}
+          botVersion={versionToView}
+          onEdit={handleEditFromView}
+        />
+      )}
 
       <BotVersionModal 
         isOpen={isModalOpen}

@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { MeetingEvent, User } from '../types';
 import MeetingModal from './MeetingModal';
+import MeetingViewModal from './MeetingViewModal';
 import { ChevronLeft, ChevronRight, Plus, ExternalLink, Users } from 'lucide-react';
 
 interface MeetingsViewProps {
@@ -14,8 +15,10 @@ interface MeetingsViewProps {
 
 const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, onSaveMeeting, onDeleteMeeting }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<MeetingEvent | null>(null);
+  const [viewingEvent, setViewingEvent] = useState<MeetingEvent | null>(null);
 
   const clients = useMemo(() => {
     const clientNames = new Set<string>();
@@ -71,9 +74,22 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, onSa
     setIsModalOpen(true);
   };
 
+  const openViewModal = (event: MeetingEvent) => {
+    setViewingEvent(event);
+    setIsViewModalOpen(true);
+  };
+
   const openEditModal = (event: MeetingEvent) => {
     setEditingEvent(event);
     setIsModalOpen(true);
+  };
+
+  const handleEditFromView = () => {
+    if (viewingEvent) {
+      setEditingEvent(viewingEvent);
+      setIsViewModalOpen(false);
+      setIsModalOpen(true);
+    }
   };
 
   const hours = Array.from({ length: 12 }, (_, i) => i + 8);
@@ -160,7 +176,7 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, onSa
                     .map(event => (
                       <div
                         key={event.id}
-                        onClick={() => openEditModal(event)}
+                        onClick={() => openViewModal(event)}
                         className="absolute left-1 right-1 rounded border-l-4 border-l-neon bg-surface-med border-y border-r border-border-subtle/50 p-0 cursor-pointer hover:bg-surface-low hover:border-l-neon-blue hover:shadow-neon-glow/20 transition-all z-10 overflow-hidden group flex flex-col"
                         style={getEventStyle(event)}
                       >
@@ -228,6 +244,17 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, onSa
           </div>
         </div>
       </div>
+
+      {viewingEvent && (
+        <MeetingViewModal
+          isOpen={isViewModalOpen}
+          onClose={() => { setIsViewModalOpen(false); setViewingEvent(null); }}
+          meeting={viewingEvent}
+          users={users}
+          clients={clients}
+          onEdit={handleEditFromView}
+        />
+      )}
 
       <MeetingModal 
         isOpen={isModalOpen}

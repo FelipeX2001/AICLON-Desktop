@@ -1,40 +1,53 @@
 
-import React, { useState, useEffect } from 'react';
-import { ActiveClient, Lead, LEAD_STAGES } from '../types';
+import React, { useState } from 'react';
+import { ActiveClient, Lead, DroppedClient, LEAD_STAGES, User } from '../types';
+import ActiveClientViewModal from './ActiveClientViewModal';
 import ActiveClientModal from './ActiveClientModal';
+import LeadViewModal from './LeadViewModal';
+import LeadModal from './LeadModal';
 import DroppedClientsView from './DroppedClientsView';
-import { Plus, Users, TrendingUp, AlertCircle, Search, Building2, Briefcase, MapPin, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
+import { Users, TrendingUp, AlertCircle, Briefcase, MapPin, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
 
-const ClientsDashboard: React.FC = () => {
-  // --- ACTIVE CLIENTS STATE (Unified Source) ---
-  const [activeClients, setActiveClients] = useState<ActiveClient[]>(() => {
-    try {
-        const saved = localStorage.getItem('aiclon_active_clients');
-        return saved ? JSON.parse(saved) : [];
-    } catch(e) { return []; }
-  });
+interface ClientsDashboardProps {
+  users: User[];
+  activeClients: ActiveClient[];
+  leads: Lead[];
+  droppedClients: DroppedClient[];
+  onSaveActiveClient: (client: ActiveClient) => void;
+  onDeleteActiveClient: (id: string) => void;
+  onSaveLead: (lead: Lead) => void;
+  onDeleteLead: (id: string) => void;
+  onSaveDroppedClient: (client: DroppedClient) => void;
+  onDeleteDroppedClient: (id: string) => void;
+  onRecoverClient: (client: DroppedClient) => void;
+}
 
-  // --- LEADS STATE (Read-only for summary) ---
-  const [leads, setLeads] = useState<Lead[]>(() => {
-     try {
-        const saved = localStorage.getItem('aiclon_leads');
-        return saved ? JSON.parse(saved) : [];
-     } catch(e) { return []; }
-  });
-
-  // --- VIEW STATE ---
+const ClientsDashboard: React.FC<ClientsDashboardProps> = ({
+  users,
+  activeClients,
+  leads,
+  droppedClients,
+  onSaveActiveClient,
+  onDeleteActiveClient,
+  onSaveLead,
+  onDeleteLead,
+  onSaveDroppedClient,
+  onDeleteDroppedClient,
+  onRecoverClient
+}) => {
   const [showDroppedClients, setShowDroppedClients] = useState(false);
 
-  // --- MODAL STATE ---
-  const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [clientToView, setClientToView] = useState<ActiveClient | null>(null);
+  const [isClientViewModalOpen, setIsClientViewModalOpen] = useState(false);
+  const [isClientEditModalOpen, setIsClientEditModalOpen] = useState(false);
 
-  // --- KPI CALCULATIONS ---
+  const [leadToView, setLeadToView] = useState<Lead | null>(null);
+  const [isLeadViewModalOpen, setIsLeadViewModalOpen] = useState(false);
+  const [isLeadEditModalOpen, setIsLeadEditModalOpen] = useState(false);
+
   const totalActiveClients = activeClients.filter(c => c.estado_servicio === 'En servicio' || c.estado_servicio === 'Desarrollos extra').length;
   
-  // Ingresos Mensuales: Sum of valor_mensual_servicio
   const totalMonthlyIncome = activeClients.reduce((acc, client) => {
-     // Remove non-numeric chars except dot
      const valStr = client.valor_mensual_servicio?.toString().replace(/[^0-9.]/g, '') || '0';
      const val = parseFloat(valStr);
      return acc + (isNaN(val) ? 0 : val);
@@ -42,7 +55,6 @@ const ClientsDashboard: React.FC = () => {
   
   const totalActiveLeads = leads.filter(l => l.etapa !== 'Lead Cerrado').length;
   
-  // Cierre Próximo
   const leadsClosingSoon = leads.filter(l => {
       const stageIndex = LEAD_STAGES.indexOf(l.etapa);
       const capIndex = LEAD_STAGES.indexOf('Reunión de Capacitación');
@@ -51,33 +63,29 @@ const ClientsDashboard: React.FC = () => {
   }).length;
 
   const handleOpenClient = (client: ActiveClient) => {
-      setClientToView(client);
-      setIsClientModalOpen(true);
+    setClientToView(client);
+    setIsClientViewModalOpen(true);
   };
 
-  // Function to refresh data after changes (passed to modals/components if needed, or rely on re-mount/localstorage events)
-  const refreshData = () => {
-      const savedActive = localStorage.getItem('aiclon_active_clients');
-      if (savedActive) setActiveClients(JSON.parse(savedActive));
-      
-      const savedLeads = localStorage.getItem('aiclon_leads');
-      if (savedLeads) setLeads(JSON.parse(savedLeads));
+  const handleEditClient = () => {
+    setIsClientViewModalOpen(false);
+    setIsClientEditModalOpen(true);
   };
 
-  // Watch for local storage changes (optional simple mechanism)
-  useEffect(() => {
-      // This effect only runs on mount/update, real-time across components needs custom event or context. 
-      // For simplicity, we assume navigation or modal close triggers re-renders or we poll.
-      const interval = setInterval(refreshData, 2000); // Simple polling for data sync
-      return () => clearInterval(interval);
-  }, []);
+  const handleOpenLead = (lead: Lead) => {
+    setLeadToView(lead);
+    setIsLeadViewModalOpen(true);
+  };
+
+  const handleEditLead = () => {
+    setIsLeadViewModalOpen(false);
+    setIsLeadEditModalOpen(true);
+  };
 
   return (
     <div className="h-full flex flex-col pb-2 relative">
       
-      {/* Main Content (Flex Grow to fill space) */}
       <div className={`flex-1 flex flex-col md:flex-row gap-6 transition-all duration-500 min-h-0 ${showDroppedClients ? 'opacity-20 pointer-events-none scale-95 origin-top' : 'opacity-100'}`}>
-          {/* --- LEFT COLUMN: CLIENTES ACTUALES --- */}
           <div className="flex-1 flex flex-col space-y-6 min-w-0 h-full">
              <div className="flex justify-between items-center flex-shrink-0">
                 <div>
@@ -86,7 +94,6 @@ const ClientsDashboard: React.FC = () => {
                 </div>
              </div>
 
-             {/* KPIs */}
              <div className="grid grid-cols-2 gap-4 flex-shrink-0">
                 <div className="bg-surface-low border border-border-subtle rounded-xl p-4 flex flex-col">
                    <div className="flex items-center text-neon mb-2">
@@ -104,7 +111,6 @@ const ClientsDashboard: React.FC = () => {
                 </div>
              </div>
 
-             {/* List */}
              <div className="flex-1 bg-surface-low border border-border-subtle rounded-xl overflow-hidden flex flex-col min-h-[200px]">
                 <div className="p-4 border-b border-border-subtle bg-surface-med/50">
                    <h3 className="text-sm font-bold text-mist uppercase">Listado Reciente</h3>
@@ -140,7 +146,6 @@ const ClientsDashboard: React.FC = () => {
              </div>
           </div>
 
-          {/* --- RIGHT COLUMN: LEADS SUMMARY --- */}
           <div className="flex-1 flex flex-col space-y-6 min-w-0 border-l border-border-subtle pl-0 md:pl-6 h-full">
              <div className="flex justify-between items-center flex-shrink-0">
                 <div>
@@ -149,7 +154,6 @@ const ClientsDashboard: React.FC = () => {
                 </div>
              </div>
 
-              {/* KPIs */}
              <div className="grid grid-cols-2 gap-4 flex-shrink-0">
                 <div className="bg-surface-low border border-border-subtle rounded-xl p-4 flex flex-col">
                    <div className="flex items-center text-neon-orange mb-2">
@@ -167,7 +171,6 @@ const ClientsDashboard: React.FC = () => {
                 </div>
              </div>
 
-             {/* Pipeline Summary List */}
              <div className="flex-1 bg-surface-low border border-border-subtle rounded-xl overflow-hidden flex flex-col min-h-[200px]">
                 <div className="p-4 border-b border-border-subtle bg-surface-med/50 flex justify-between items-center">
                    <h3 className="text-sm font-bold text-mist uppercase">Pipeline Actual</h3>
@@ -176,7 +179,7 @@ const ClientsDashboard: React.FC = () => {
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
                     <div className="divide-y divide-border-subtle">
                        {leads.filter(l => l.etapa !== 'Lead Cerrado').map(lead => (
-                          <div key={lead.id} className="p-4 hover:bg-surface-med transition-colors flex items-center justify-between">
+                          <div key={lead.id} onClick={() => handleOpenLead(lead)} className="p-4 hover:bg-surface-med transition-colors cursor-pointer flex items-center justify-between">
                              <div className="min-w-0 flex-1 mr-4">
                                 <h4 className="font-bold text-mist text-sm truncate">{lead.nombre_empresa || lead.nombre_contacto}</h4>
                                 <p className="text-xs text-mist-muted">{lead.etapa}</p>
@@ -200,7 +203,6 @@ const ClientsDashboard: React.FC = () => {
           </div>
       </div>
 
-      {/* --- DROPPED CLIENTS TOGGLE (FOOTER) --- */}
       <div className="relative mt-auto pt-8">
           <div className="absolute inset-0 flex items-center top-8" aria-hidden="true">
             <div className="w-full border-t border-border-subtle"></div>
@@ -218,31 +220,78 @@ const ClientsDashboard: React.FC = () => {
           </div>
       </div>
 
-      {/* --- DROPPED CLIENTS VIEW --- */}
       {showDroppedClients && (
           <div className="mt-4 animate-in slide-in-from-bottom-4 duration-300">
-              <DroppedClientsView />
+              <DroppedClientsView 
+                droppedClients={droppedClients}
+                onRecover={onRecoverClient}
+                onDelete={onDeleteDroppedClient}
+              />
           </div>
       )}
 
-      <ActiveClientModal 
-         isOpen={isClientModalOpen}
-         onClose={() => setIsClientModalOpen(false)}
-         clientToEdit={clientToView}
-         onSave={(updated) => {
-             setActiveClients(prev => prev.map(c => c.activeId === updated.activeId ? updated : c));
-             setIsClientModalOpen(false);
-         }}
-         onDelete={(id) => {
-             setActiveClients(prev => prev.filter(c => c.activeId !== id));
-             setIsClientModalOpen(false);
-         }}
-         onDrop={(dropped) => {
-             // Remove from active list immediately
-             setActiveClients(prev => prev.filter(c => c.activeId !== dropped.originalId));
-             setIsClientModalOpen(false);
-         }}
-      />
+      {clientToView && (
+        <ActiveClientViewModal
+          isOpen={isClientViewModalOpen}
+          onClose={() => { setIsClientViewModalOpen(false); setClientToView(null); }}
+          client={clientToView}
+          users={users}
+          onEdit={handleEditClient}
+        />
+      )}
+
+      {clientToView && (
+        <ActiveClientModal 
+          isOpen={isClientEditModalOpen}
+          onClose={() => { setIsClientEditModalOpen(false); setClientToView(null); }}
+          clientToEdit={clientToView}
+          onSave={(updated) => {
+            onSaveActiveClient(updated);
+            setIsClientEditModalOpen(false);
+            setClientToView(null);
+          }}
+          onDelete={(id) => {
+            onDeleteActiveClient(id);
+            setIsClientEditModalOpen(false);
+            setClientToView(null);
+          }}
+          onDrop={(dropped) => {
+            onSaveDroppedClient(dropped);
+            onDeleteActiveClient(dropped.originalId);
+            setIsClientEditModalOpen(false);
+            setClientToView(null);
+          }}
+        />
+      )}
+
+      {leadToView && (
+        <LeadViewModal
+          isOpen={isLeadViewModalOpen}
+          onClose={() => { setIsLeadViewModalOpen(false); setLeadToView(null); }}
+          lead={leadToView}
+          users={users}
+          onEdit={handleEditLead}
+        />
+      )}
+
+      {leadToView && (
+        <LeadModal 
+          isOpen={isLeadEditModalOpen}
+          onClose={() => { setIsLeadEditModalOpen(false); setLeadToView(null); }}
+          leadToEdit={leadToView}
+          users={users}
+          onSave={(updated) => {
+            onSaveLead(updated);
+            setIsLeadEditModalOpen(false);
+            setLeadToView(null);
+          }}
+          onDelete={(id) => {
+            onDeleteLead(id);
+            setIsLeadEditModalOpen(false);
+            setLeadToView(null);
+          }}
+        />
+      )}
     </div>
   );
 };

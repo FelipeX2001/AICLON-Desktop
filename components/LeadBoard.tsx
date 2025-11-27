@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { Lead, LEAD_STAGES, LeadStage, LeadMilestones, User, ActiveClient, DroppedClient } from '../types';
 import LeadModal from './LeadModal';
+import LeadViewModal from './LeadViewModal';
 import { Plus, GripVertical, Briefcase, ArrowRightCircle, X, Save, DollarSign, Calendar, User as UserIcon } from 'lucide-react';
 
 interface LeadBoardProps {
@@ -23,8 +24,10 @@ const DEFAULT_MILESTONES: LeadMilestones = {
 };
 
 const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, onDeleteLead }) => {
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
+  const [viewingLead, setViewingLead] = useState<Lead | null>(null);
 
   const [isConversionModalOpen, setIsConversionModalOpen] = useState(false);
   const [leadToConvert, setLeadToConvert] = useState<Lead | null>(null);
@@ -63,9 +66,22 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
     setIsModalOpen(true);
   };
 
+  const openViewModal = (lead: Lead) => {
+    setViewingLead(lead);
+    setIsViewModalOpen(true);
+  };
+
   const openEditModal = (lead: Lead) => {
     setEditingLead(lead);
     setIsModalOpen(true);
+  };
+
+  const handleEditFromView = () => {
+    if (viewingLead) {
+      setEditingLead(viewingLead);
+      setIsViewModalOpen(false);
+      setIsModalOpen(true);
+    }
   };
 
   const openConversionModal = (e: React.MouseEvent, lead: Lead) => {
@@ -191,7 +207,7 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
                       key={lead.id}
                       draggable
                       onDragStart={(e) => handleDragStart(e, lead.id)}
-                      onClick={() => openEditModal(lead)}
+                      onClick={() => openViewModal(lead)}
                       className="lead-card bg-night border border-border-subtle rounded-lg hover:border-neon/50 hover:shadow-card-glow transition-all cursor-pointer group relative flex flex-col overflow-hidden p-4"
                     >
                       {lead.coverUrl && (
@@ -335,6 +351,16 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
             </form>
           </div>
         </div>
+      )}
+
+      {viewingLead && (
+        <LeadViewModal
+          isOpen={isViewModalOpen}
+          onClose={() => { setIsViewModalOpen(false); setViewingLead(null); }}
+          lead={viewingLead}
+          users={users || []}
+          onEdit={handleEditFromView}
+        />
       )}
     </div>
   );

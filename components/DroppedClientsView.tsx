@@ -1,45 +1,19 @@
 
-import React, { useState, useEffect } from 'react';
-import { DroppedClient, ActiveClient, Lead } from '../types';
-import { RefreshCw, Trash2, Search, Calendar, FileText, User } from 'lucide-react';
+import React from 'react';
+import { DroppedClient } from '../types';
+import { RefreshCw, Trash2, Calendar } from 'lucide-react';
 
-const DroppedClientsView: React.FC = () => {
-  const [droppedClients, setDroppedClients] = useState<DroppedClient[]>(() => {
-    try {
-      const saved = localStorage.getItem('aiclon_dropped_clients');
-      return saved ? JSON.parse(saved) : [];
-    } catch { return []; }
-  });
+interface DroppedClientsViewProps {
+  droppedClients: DroppedClient[];
+  onRecover: (client: DroppedClient) => void;
+  onDelete: (id: string) => void;
+}
 
-  useEffect(() => {
-    localStorage.setItem('aiclon_dropped_clients', JSON.stringify(droppedClients));
-  }, [droppedClients]);
-
-  const handleRecover = (client: DroppedClient) => {
-    try {
-      if (client.type === 'active') {
-        const savedActive = localStorage.getItem('aiclon_active_clients');
-        const activeClients: ActiveClient[] = savedActive ? JSON.parse(savedActive) : [];
-        // Add back
-        activeClients.push(client.originalData as ActiveClient);
-        localStorage.setItem('aiclon_active_clients', JSON.stringify(activeClients));
-      } else {
-        const savedLeads = localStorage.getItem('aiclon_leads');
-        const leads: Lead[] = savedLeads ? JSON.parse(savedLeads) : [];
-        // Add back
-        leads.push(client.originalData as Lead);
-        localStorage.setItem('aiclon_leads', JSON.stringify(leads));
-      }
-
-      // Remove from dropped list
-      setDroppedClients(prev => prev.filter(c => c.id !== client.id));
-      alert('Cliente recuperado exitosamente.');
-      // Ideally trigger a global refresh or context update, but localstorage works on next mount
-    } catch (error) {
-      console.error("Error recovering client", error);
-    }
-  };
-
+const DroppedClientsView: React.FC<DroppedClientsViewProps> = ({
+  droppedClients,
+  onRecover,
+  onDelete
+}) => {
   return (
     <div className="bg-night/50 rounded-xl border border-border-subtle overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
       <div className="p-6 border-b border-border-subtle bg-surface-low/30 flex justify-between items-center">
@@ -89,13 +63,21 @@ const DroppedClientsView: React.FC = () => {
                                 {client.droppedDate}
                             </div>
                         </td>
-                        <td className="p-4 text-center">
-                            <button 
-                                onClick={() => handleRecover(client)}
-                                className="text-xs font-bold text-neon hover:bg-neon/10 border border-neon/30 px-3 py-1.5 rounded-lg transition-colors flex items-center justify-center mx-auto"
-                            >
-                                <RefreshCw size={12} className="mr-1.5" /> Recuperar
-                            </button>
+                        <td className="p-4">
+                            <div className="flex items-center justify-center gap-2">
+                              <button 
+                                  onClick={() => onRecover(client)}
+                                  className="text-xs font-bold text-neon hover:bg-neon/10 border border-neon/30 px-3 py-1.5 rounded-lg transition-colors flex items-center"
+                              >
+                                  <RefreshCw size={12} className="mr-1.5" /> Recuperar
+                              </button>
+                              <button 
+                                  onClick={() => onDelete(client.id)}
+                                  className="text-xs font-bold text-red-400 hover:bg-red-500/10 border border-red-500/30 px-2 py-1.5 rounded-lg transition-colors"
+                              >
+                                  <Trash2 size={12} />
+                              </button>
+                            </div>
                         </td>
                     </tr>
                 ))

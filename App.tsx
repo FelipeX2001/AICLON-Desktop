@@ -739,6 +739,69 @@ const App: React.FC = () => {
     }
   };
 
+  const handleDeleteDroppedClient = async (clientId: string) => {
+    try {
+      await droppedClientsAPI.delete(Number(clientId));
+      setDroppedClients(prev => prev.filter(c => c.id !== clientId));
+    } catch (error: any) {
+      alert("Error al eliminar registro: " + error.message);
+    }
+  };
+
+  const handleRecoverClient = async (client: DroppedClient) => {
+    try {
+      if (client.type === 'active' && client.originalData) {
+        const originalClient = client.originalData as ActiveClient;
+        const created = await activeClientsAPI.create({
+          leadId: originalClient.leadId ? Number(originalClient.leadId) : undefined,
+          estadoServicio: originalClient.estado_servicio,
+          fechaInicioServicio: originalClient.fecha_inicio_servicio,
+          fechaCorte: originalClient.fecha_corte,
+          pagoMesActual: originalClient.pago_mes_actual,
+          valorMensualServicio: originalClient.valor_mensual_servicio
+        });
+        setActiveClients(prev => [...prev, {
+          ...originalClient,
+          activeId: String(created.id)
+        }]);
+      } else if (client.type === 'lead' && client.originalData) {
+        const originalLead = client.originalData as Lead;
+        const created = await leadsAPI.create({
+          etapa: originalLead.etapa,
+          assignedUserId: originalLead.assignedUserId ? Number(originalLead.assignedUserId) : undefined,
+          nombreEmpresa: originalLead.nombre_empresa,
+          nombreContacto: originalLead.nombre_contacto,
+          sector: originalLead.sector,
+          ciudad: originalLead.ciudad,
+          telefono: originalLead.telefono,
+          email: originalLead.email,
+          emailSecundario: originalLead.email_secundario,
+          web: originalLead.web,
+          fuenteOrigen: originalLead.fuente_origen,
+          servicioInteres: originalLead.servicio_interes,
+          necesidad: originalLead.necesidad,
+          fechaEnvioPropuesta: originalLead.fecha_envio_propuesta,
+          valorImplementacion: originalLead.valor_implementacion,
+          valorMensualidad: originalLead.valor_mensualidad,
+          fechaPrimerContacto: originalLead.fecha_primer_contacto,
+          comentarios: originalLead.comentarios,
+          resultadoFinal: originalLead.resultado_final,
+          fechaCierreReal: originalLead.fecha_cierre_real,
+          hitos: originalLead.hitos
+        });
+        setLeads(prev => [...prev, {
+          ...originalLead,
+          id: String(created.id)
+        }]);
+      }
+      
+      await droppedClientsAPI.delete(Number(client.id));
+      setDroppedClients(prev => prev.filter(c => c.id !== client.id));
+    } catch (error: any) {
+      alert("Error al recuperar cliente: " + error.message);
+    }
+  };
+
   const handleSaveBotListCover = (type: string, coverUrl: string) => {
     setBotListCovers(prev => ({ ...prev, [type]: coverUrl }));
   };
@@ -831,7 +894,21 @@ const App: React.FC = () => {
           />
         );
       case 'clients-general':
-        return <ClientsDashboard />;
+        return (
+          <ClientsDashboard 
+            users={validUsers}
+            activeClients={validActiveClients}
+            leads={validLeads}
+            droppedClients={droppedClients}
+            onSaveActiveClient={handleSaveActiveClient}
+            onDeleteActiveClient={handleDeleteActiveClient}
+            onSaveLead={handleSaveLead}
+            onDeleteLead={handleDeleteLead}
+            onSaveDroppedClient={handleSaveDroppedClient}
+            onDeleteDroppedClient={handleDeleteDroppedClient}
+            onRecoverClient={handleRecoverClient}
+          />
+        );
       case 'clients-active':
         return (
           <ActiveClientsBoard 
