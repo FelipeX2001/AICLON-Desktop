@@ -6,6 +6,24 @@ import { eq } from 'drizzle-orm';
 
 const router = Router();
 
+const transformUserForClient = (dbUser: any) => {
+  return {
+    id: String(dbUser.id),
+    name: dbUser.name,
+    email: dbUser.email,
+    avatarUrl: dbUser.avatarUrl || dbUser.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + dbUser.email,
+    role: dbUser.role,
+    isActive: dbUser.isActive ?? dbUser.is_active ?? true,
+    mustChangePassword: dbUser.mustChangePassword ?? dbUser.must_change_password ?? false,
+    isDeleted: dbUser.isDeleted ?? dbUser.is_deleted ?? false,
+    deletedAt: dbUser.deletedAt || dbUser.deleted_at || null,
+    createdAt: dbUser.createdAt || dbUser.created_at,
+    updatedAt: dbUser.updatedAt || dbUser.updated_at,
+    coverUrl: dbUser.coverUrl || dbUser.cover_url || null,
+    coverPosition: dbUser.coverPosition || dbUser.cover_position || null,
+  };
+};
+
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -26,8 +44,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Hubo un error en el usuario o la contraseña.' });
     }
     
-    const { passwordHash, ...userWithoutPassword } = user;
-    res.json({ user: userWithoutPassword });
+    res.json({ user: transformUserForClient(user) });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Error en el servidor' });

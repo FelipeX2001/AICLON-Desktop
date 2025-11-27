@@ -6,11 +6,29 @@ import { eq, and } from 'drizzle-orm';
 
 const router = Router();
 
+const transformUserForClient = (dbUser: any) => {
+  return {
+    id: String(dbUser.id),
+    name: dbUser.name,
+    email: dbUser.email,
+    avatarUrl: dbUser.avatarUrl || dbUser.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + dbUser.email,
+    role: dbUser.role,
+    isActive: dbUser.isActive ?? dbUser.is_active ?? true,
+    mustChangePassword: dbUser.mustChangePassword ?? dbUser.must_change_password ?? false,
+    isDeleted: dbUser.isDeleted ?? dbUser.is_deleted ?? false,
+    deletedAt: dbUser.deletedAt || dbUser.deleted_at || null,
+    createdAt: dbUser.createdAt || dbUser.created_at,
+    updatedAt: dbUser.updatedAt || dbUser.updated_at,
+    coverUrl: dbUser.coverUrl || dbUser.cover_url || null,
+    coverPosition: dbUser.coverPosition || dbUser.cover_position || null,
+  };
+};
+
 router.get('/', async (req, res) => {
   try {
     const allUsers = await db.select().from(users).where(eq(users.isDeleted, false));
-    const usersWithoutPasswords = allUsers.map(({ passwordHash, ...user }) => user);
-    res.json(usersWithoutPasswords);
+    const transformedUsers = allUsers.map(transformUserForClient);
+    res.json(transformedUsers);
   } catch (error) {
     console.error('Get users error:', error);
     res.status(500).json({ error: 'Error en el servidor' });
@@ -26,14 +44,13 @@ router.post('/', async (req, res) => {
       name,
       email,
       role,
-      avatarUrl,
+      avatarUrl: avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + email,
       passwordHash: hashedPassword,
       mustChangePassword: true,
       isActive: true,
     }).returning();
     
-    const { passwordHash, ...userWithoutPassword } = newUser;
-    res.status(201).json(userWithoutPassword);
+    res.status(201).json(transformUserForClient(newUser));
   } catch (error) {
     console.error('Create user error:', error);
     res.status(500).json({ error: 'Error en el servidor' });
@@ -50,8 +67,7 @@ router.put('/:id', async (req, res) => {
       .where(eq(users.id, Number(id)))
       .returning();
     
-    const { passwordHash, ...userWithoutPassword } = updatedUser;
-    res.json(userWithoutPassword);
+    res.json(transformUserForClient(updatedUser));
   } catch (error) {
     console.error('Update user error:', error);
     res.status(500).json({ error: 'Error en el servidor' });
