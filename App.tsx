@@ -972,10 +972,16 @@ const App: React.FC = () => {
               currentUser={currentUser || undefined}
               onBack={() => {
                 setIsEditingTutorial(false);
-                setSelectedTutorial(null);
               }}
-              onSave={handleSaveTutorial}
-              onDelete={handleDeleteTutorial}
+              onSave={(tutorial) => {
+                handleSaveTutorial(tutorial);
+                setIsEditingTutorial(false);
+              }}
+              onDelete={(id) => {
+                handleDeleteTutorial(id);
+                setSelectedTutorial(null);
+                setIsEditingTutorial(false);
+              }}
             />
           );
         }

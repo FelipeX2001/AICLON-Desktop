@@ -79,12 +79,10 @@ const TutorialEditPage: React.FC<TutorialEditPageProps> = ({ tutorial, currentUs
       media: media.filter(m => m.url.trim() !== '')
     };
     onSave(updatedTutorial);
-    onBack();
   };
 
   const handleDelete = () => {
     onDelete(tutorial.id);
-    onBack();
   };
 
   return (
