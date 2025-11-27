@@ -217,3 +217,45 @@ export const notificationsAPI = {
       method: 'DELETE',
     }),
 };
+
+export const droppedClientsAPI = {
+  getAll: () => fetchAPI<any[]>('/dropped-clients'),
+  
+  create: (client: any) =>
+    fetchAPI<any>('/dropped-clients', {
+      method: 'POST',
+      body: JSON.stringify(client),
+    }),
+
+  update: (id: number, client: any) =>
+    fetchAPI<any>(`/dropped-clients/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(client),
+    }),
+
+  delete: (id: number) =>
+    fetchAPI<{ success: boolean }>(`/dropped-clients/${id}`, {
+      method: 'DELETE',
+    }),
+};
+
+export const demosAPI = {
+  getAll: () => fetchAPI<any[]>('/demos'),
+  
+  create: (demo: any) =>
+    fetchAPI<any>('/demos', {
+      method: 'POST',
+      body: JSON.stringify(demo),
+    }),
+
+  update: (id: number, demo: any) =>
+    fetchAPI<any>(`/demos/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(demo),
+    }),
+
+  delete: (id: number) =>
+    fetchAPI<{ success: boolean }>(`/demos/${id}`, {
+      method: 'DELETE',
+    }),
+};
