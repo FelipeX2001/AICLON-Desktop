@@ -5,6 +5,19 @@ import { eq } from 'drizzle-orm';
 
 const router = Router();
 
+function transformActiveClientFromClient(data: any) {
+  return {
+    leadId: data.leadId || data.lead_id,
+    estadoServicio: data.estadoServicio || data.estado_servicio,
+    fechaInicioServicio: data.fechaInicioServicio || data.fecha_inicio_servicio,
+    fechaCorte: data.fechaCorte || data.fecha_corte,
+    pagoMesActual: data.pagoMesActual ?? data.pago_mes_actual ?? false,
+    valorMensualServicio: data.valorMensualServicio || data.valor_mensual_servicio,
+    coverUrl: data.coverUrl,
+    coverPosition: data.coverPosition,
+  };
+}
+
 router.get('/', async (req, res) => {
   try {
     const allActiveClients = await db.select({
@@ -42,8 +55,10 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    const clientData = transformActiveClientFromClient(req.body);
+    console.log('[DEBUG] ActiveClient update - coverUrl:', clientData.coverUrl ? 'YES (length: ' + clientData.coverUrl.length + ')' : 'NO');
     const [updatedActiveClient] = await db.update(activeClients)
-      .set({ ...req.body, updatedAt: new Date() })
+      .set({ ...clientData, updatedAt: new Date() })
       .where(eq(activeClients.id, Number(id)))
       .returning();
     res.json(updatedActiveClient);

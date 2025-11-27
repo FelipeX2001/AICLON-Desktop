@@ -114,7 +114,9 @@ const ActiveClientModal: React.FC<ActiveClientModalProps> = ({
                     <div className="mb-6">
                         <ImageUploadField 
                             value={formData.coverUrl} 
-                            onChange={(url) => setFormData(prev => ({...prev, coverUrl: url}))} 
+                            onChange={(url) => setFormData(prev => ({...prev, coverUrl: url}))}
+                            onPositionChange={(pos) => setFormData(prev => ({...prev, coverPosition: pos}))}
+                            position={formData.coverPosition}
                         />
                     </div>
 
