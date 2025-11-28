@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Task, TaskStatus, TaskPriority, User, Subtask } from '../types';
 import { X, Save, CheckSquare, User as UserIcon, Building2, AlertTriangle, Calendar, Trash2, AlignLeft, ListChecks, Plus, Minus } from 'lucide-react';
 import ImageUploadField from './ImageUploadField';
+import SearchableSelect from './SearchableSelect';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -204,18 +205,18 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-2">
-                <Building2 size={14}/> Cliente
-            </label>
-            <select 
-                required
-                value={formData.clientName || ''} 
-                onChange={e => setFormData({...formData, clientName: e.target.value})} 
-                className="w-full bg-surface-low border border-border-subtle rounded p-2 text-mist focus:border-neon focus:outline-none"
-            >
-                <option value="">Seleccionar</option>
-                {clients.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <div className="flex items-center gap-2 mb-2">
+                <Building2 size={14} className="text-mist-muted"/>
+                <span className="text-xs uppercase font-bold text-mist-muted">Cliente</span>
+            </div>
+            <SearchableSelect
+                value={formData.clientName || ''}
+                onChange={(val) => setFormData({...formData, clientName: val})}
+                options={clients}
+                placeholder="Buscar cliente..."
+                required={true}
+                allowCustom={true}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
