@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ActiveClient, Lead, DroppedClient, LEAD_STAGES, User } from '../types';
 import ActiveClientViewModal from './ActiveClientViewModal';
 import ActiveClientModal from './ActiveClientModal';
 import LeadViewModal from './LeadViewModal';
 import LeadModal from './LeadModal';
 import DroppedClientsView from './DroppedClientsView';
-import { Users, TrendingUp, AlertCircle, Briefcase, MapPin, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
+import { Users, TrendingUp, AlertCircle, Briefcase, MapPin, DollarSign, ChevronDown, ChevronUp, Search, X } from 'lucide-react';
 
 interface ClientsDashboardProps {
   users: User[];
@@ -47,6 +47,28 @@ const ClientsDashboard: React.FC<ClientsDashboardProps> = ({
   const [leadToView, setLeadToView] = useState<Lead | null>(null);
   const [isLeadViewModalOpen, setIsLeadViewModalOpen] = useState(false);
   const [isLeadEditModalOpen, setIsLeadEditModalOpen] = useState(false);
+
+  const [searchClients, setSearchClients] = useState('');
+  const [searchLeads, setSearchLeads] = useState('');
+
+  const filteredActiveClients = useMemo(() => {
+    if (!searchClients.trim()) return activeClients;
+    const term = searchClients.toLowerCase();
+    return activeClients.filter(c => 
+      c.nombre_empresa?.toLowerCase().includes(term) ||
+      c.nombre_contacto?.toLowerCase().includes(term)
+    );
+  }, [activeClients, searchClients]);
+
+  const filteredLeads = useMemo(() => {
+    const activeLeads = leads.filter(l => l.etapa !== 'Lead Cerrado');
+    if (!searchLeads.trim()) return activeLeads;
+    const term = searchLeads.toLowerCase();
+    return activeLeads.filter(l => 
+      l.nombre_empresa?.toLowerCase().includes(term) ||
+      l.nombre_contacto?.toLowerCase().includes(term)
+    );
+  }, [leads, searchLeads]);
 
   const totalActiveClients = activeClients.filter(c => c.estado_servicio === 'En servicio' || c.estado_servicio === 'Desarrollos extra').length;
   
@@ -115,17 +137,35 @@ const ClientsDashboard: React.FC<ClientsDashboardProps> = ({
              </div>
 
              <div className="flex-1 bg-surface-low border border-border-subtle rounded-xl overflow-hidden flex flex-col min-h-[200px]">
-                <div className="p-4 border-b border-border-subtle bg-surface-med/50">
+                <div className="p-4 border-b border-border-subtle bg-surface-med/50 space-y-3">
                    <h3 className="text-sm font-bold text-mist uppercase">Listado Reciente</h3>
+                   <div className="relative">
+                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist-muted" />
+                     <input
+                       type="text"
+                       value={searchClients}
+                       onChange={(e) => setSearchClients(e.target.value)}
+                       placeholder="Buscar por nombre..."
+                       className="w-full pl-9 pr-8 py-2 text-sm rounded-lg bg-night border border-border-subtle focus:border-neon focus:outline-none text-mist placeholder-mist-faint"
+                     />
+                     {searchClients && (
+                       <button
+                         onClick={() => setSearchClients('')}
+                         className="absolute right-2 top-1/2 -translate-y-1/2 text-mist-muted hover:text-mist"
+                       >
+                         <X size={14} />
+                       </button>
+                     )}
+                   </div>
                 </div>
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
-                   {activeClients.length === 0 ? (
+                   {filteredActiveClients.length === 0 ? (
                       <div className="h-32 flex items-center justify-center text-mist-faint text-sm italic">
-                         No hay clientes activos registrados.
+                         {searchClients ? 'No se encontraron clientes.' : 'No hay clientes activos registrados.'}
                       </div>
                    ) : (
                       <div className="divide-y divide-border-subtle">
-                         {activeClients.map(client => (
+                         {filteredActiveClients.map(client => (
                             <div key={client.activeId} onClick={() => handleOpenClient(client)} className="p-4 hover:bg-surface-med transition-colors cursor-pointer group">
                                <div className="flex justify-between items-start mb-1">
                                   <h4 className="font-bold text-mist group-hover:text-neon">{client.nombre_empresa}</h4>
@@ -175,13 +215,33 @@ const ClientsDashboard: React.FC<ClientsDashboardProps> = ({
              </div>
 
              <div className="flex-1 bg-surface-low border border-border-subtle rounded-xl overflow-hidden flex flex-col min-h-[200px]">
-                <div className="p-4 border-b border-border-subtle bg-surface-med/50 flex justify-between items-center">
-                   <h3 className="text-sm font-bold text-mist uppercase">Pipeline Actual</h3>
-                   <span className="text-[10px] text-mist-muted italic">Solo leads activos</span>
+                <div className="p-4 border-b border-border-subtle bg-surface-med/50 space-y-3">
+                   <div className="flex justify-between items-center">
+                     <h3 className="text-sm font-bold text-mist uppercase">Pipeline Actual</h3>
+                     <span className="text-[10px] text-mist-muted italic">Solo leads activos</span>
+                   </div>
+                   <div className="relative">
+                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist-muted" />
+                     <input
+                       type="text"
+                       value={searchLeads}
+                       onChange={(e) => setSearchLeads(e.target.value)}
+                       placeholder="Buscar por nombre..."
+                       className="w-full pl-9 pr-8 py-2 text-sm rounded-lg bg-night border border-border-subtle focus:border-neon focus:outline-none text-mist placeholder-mist-faint"
+                     />
+                     {searchLeads && (
+                       <button
+                         onClick={() => setSearchLeads('')}
+                         className="absolute right-2 top-1/2 -translate-y-1/2 text-mist-muted hover:text-mist"
+                       >
+                         <X size={14} />
+                       </button>
+                     )}
+                   </div>
                 </div>
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
                     <div className="divide-y divide-border-subtle">
-                       {leads.filter(l => l.etapa !== 'Lead Cerrado').map(lead => (
+                       {filteredLeads.map(lead => (
                           <div key={lead.id} onClick={() => handleOpenLead(lead)} className="p-4 hover:bg-surface-med transition-colors cursor-pointer flex items-center justify-between">
                              <div className="min-w-0 flex-1 mr-4">
                                 <h4 className="font-bold text-mist text-sm truncate">{lead.nombre_empresa || lead.nombre_contacto}</h4>
@@ -195,9 +255,9 @@ const ClientsDashboard: React.FC<ClientsDashboardProps> = ({
                              </div>
                           </div>
                        ))}
-                       {leads.filter(l => l.etapa !== 'Lead Cerrado').length === 0 && (
+                       {filteredLeads.length === 0 && (
                           <div className="h-32 flex items-center justify-center text-mist-faint text-sm italic">
-                             No hay leads activos en este momento.
+                             {searchLeads ? 'No se encontraron leads.' : 'No hay leads activos en este momento.'}
                           </div>
                        )}
                     </div>
