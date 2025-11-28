@@ -38,18 +38,28 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
   };
   const today = toLocalDateString(new Date());
   
-  const myTasksToday = tasks.filter(t => 
-    !t.isDeleted &&
-    t.assigneeIds?.includes(user.id) &&
-    t.deadline === today &&
-    t.status !== TaskStatus.Completed
-  );
+  const myUpcomingTasks = tasks
+    .filter(t => 
+      !t.isDeleted &&
+      t.assigneeIds?.includes(user.id) &&
+      t.status !== TaskStatus.Completed &&
+      t.deadline >= today
+    )
+    .sort((a, b) => (a.deadline || '').localeCompare(b.deadline || ''))
+    .slice(0, 5);
 
-  const myMeetingsToday = meetings.filter(m => 
-    !m.isDeleted &&
-    m.attendeeIds.includes(user.id) &&
-    m.date === today
-  ).sort((a, b) => a.startTime.localeCompare(b.startTime));
+  const myUpcomingMeetings = meetings
+    .filter(m => 
+      !m.isDeleted &&
+      m.attendeeIds.includes(user.id) &&
+      m.date >= today
+    )
+    .sort((a, b) => {
+      const dateCompare = a.date.localeCompare(b.date);
+      if (dateCompare !== 0) return dateCompare;
+      return a.startTime.localeCompare(b.startTime);
+    })
+    .slice(0, 5);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -155,7 +165,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
         <div className="relative z-10 w-full mb-8">
           <h2 className="text-5xl md:text-7xl font-designer text-mist mb-4 tracking-wide">Bienvenido, {user.name.split(' ')[0]}</h2>
           <p className="text-mist-muted text-xl">
-            Hoy tienes <span className="text-neon font-bold">{myTasksToday.length} tareas</span> y <span className="text-neon-orange font-bold">{myMeetingsToday.length} reuniones</span> pendientes.
+            Tienes <span className="text-neon font-bold">{myUpcomingTasks.length} tareas</span> y <span className="text-neon-orange font-bold">{myUpcomingMeetings.length} reuniones</span> próximas.
           </p>
         </div>
         <img src={user.avatarUrl} alt={user.name} className="w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-neon/50 p-1 shadow-[0_0_40px_rgba(0,200,255,0.4)] object-cover transform group-hover:scale-105 transition-transform duration-500"/>
@@ -167,8 +177,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
         </div>
         <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h4 className="text-sm font-bold uppercase text-mist-muted tracking-wider mb-2 border-b border-border-subtle pb-2">Tareas para Hoy</h4>
-            {myTasksToday.length === 0 ? <p className="text-xs text-mist-faint italic">Todo al día.</p> : myTasksToday.map(task => {
+            <h4 className="text-sm font-bold uppercase text-mist-muted tracking-wider mb-2 border-b border-border-subtle pb-2">Próximas Tareas</h4>
+            {myUpcomingTasks.length === 0 ? <p className="text-xs text-mist-faint italic">Todo al día.</p> : myUpcomingTasks.map(task => {
               const subtasks = task.subtasks || [];
               const completedSubtasks = subtasks.filter(s => s.completed).length;
               const totalSubtasks = subtasks.length;
@@ -206,8 +216,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks =
             })}
           </div>
           <div className="space-y-4 relative sm:border-l sm:border-border-subtle sm:pl-6">
-            <h4 className="text-sm font-bold uppercase text-mist-muted tracking-wider mb-2 border-b border-border-subtle pb-2">Agenda Hoy</h4>
-            {myMeetingsToday.length === 0 ? <p className="text-xs text-mist-faint italic">Sin reuniones.</p> : myMeetingsToday.map(meeting => (
+            <h4 className="text-sm font-bold uppercase text-mist-muted tracking-wider mb-2 border-b border-border-subtle pb-2">Próximas Reuniones</h4>
+            {myUpcomingMeetings.length === 0 ? <p className="text-xs text-mist-faint italic">Sin reuniones.</p> : myUpcomingMeetings.map(meeting => (
               <div key={meeting.id} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-white/5 transition-colors">
                 <div className="text-center min-w-[3.5rem] bg-surface-low rounded p-1 border border-border-subtle">
                   <span className="block text-base font-bold text-neon">{meeting.startTime}</span>

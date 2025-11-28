@@ -26,10 +26,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
     clients,
     defaultAssigneeId 
 }) => {
+  const toLocalDateString = (d: Date) => {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
   const [formData, setFormData] = useState<Partial<Task>>({
     status: TaskStatus.Pending,
     priority: TaskPriority.Medium,
-    deadline: new Date().toISOString().split('T')[0],
+    deadline: toLocalDateString(new Date()),
     assigneeIds: []
   });
 
@@ -46,7 +50,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
             setFormData({
                 status: TaskStatus.Pending,
                 priority: TaskPriority.Medium,
-                deadline: new Date().toISOString().split('T')[0],
+                deadline: toLocalDateString(new Date()),
                 assigneeIds: defaultAssigneeId ? [defaultAssigneeId] : [],
                 clientName: '',
                 description: '',
