@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { MeetingEvent, User } from '../types';
 import { X, Save, Trash2, Calendar, Clock, Link as LinkIcon, Users, AlignLeft, AlertTriangle, Building2, Video, MapPin } from 'lucide-react';
 import ImageUploadField from './ImageUploadField';
+import SearchableSelect from './SearchableSelect';
 
 interface MeetingModalProps {
   isOpen: boolean;
@@ -216,17 +217,17 @@ const MeetingModal: React.FC<MeetingModalProps> = ({
           
           <div className="grid grid-cols-2 gap-4">
              <div className="space-y-1">
-                <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-2">
-                   <Building2 size={14} /> Cliente
-                </label>
-                <select 
+                <div className="flex items-center gap-2 mb-2">
+                  <Building2 size={14} className="text-mist-muted" />
+                  <span className="text-xs uppercase font-bold text-mist-muted">Cliente</span>
+                </div>
+                <SearchableSelect
                     value={formData.clientId || ''}
-                    onChange={(e) => setFormData({...formData, clientId: e.target.value})}
-                    className="w-full bg-surface-low border border-border-subtle rounded p-2 text-mist focus:border-neon focus:outline-none"
-                >
-                    <option value="">(Opcional)</option>
-                    {clients.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+                    onChange={(val) => setFormData({...formData, clientId: val})}
+                    options={clients}
+                    placeholder="Buscar cliente..."
+                    allowCustom={true}
+                />
              </div>
              <div className="space-y-1">
                 <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-2">
