@@ -212,7 +212,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
             <SearchableSelect
                 value={formData.clientName || ''}
                 onChange={(val) => setFormData({...formData, clientName: val})}
-                options={clients}
+                options={['AICLON (Interno)', ...clients.filter(c => c !== 'AICLON (Interno)')]}
                 placeholder="Buscar cliente..."
                 required={true}
                 allowCustom={true}

@@ -224,7 +224,7 @@ const MeetingModal: React.FC<MeetingModalProps> = ({
                 <SearchableSelect
                     value={formData.clientName || ''}
                     onChange={(val) => setFormData({...formData, clientName: val})}
-                    options={clients}
+                    options={['AICLON (Interno)', ...clients.filter(c => c !== 'AICLON (Interno)')]}
                     placeholder="Buscar cliente..."
                     allowCustom={true}
                 />

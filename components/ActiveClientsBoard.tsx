@@ -166,50 +166,51 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
                       draggable={isAdmin}
                       onDragStart={isAdmin ? (e) => handleDragStart(e, client.activeId) : undefined}
                       onClick={() => openViewModal(client)}
-                      className="client-card bg-night border border-border-subtle rounded-lg hover:border-neon/50 hover:shadow-card-glow transition-all group relative flex flex-col overflow-hidden cursor-pointer"
+                      className="client-card bg-night border border-border-subtle rounded-lg hover:border-neon/50 hover:shadow-card-glow transition-all group relative flex flex-col overflow-hidden cursor-pointer min-h-[200px]"
                     >
+                      {/* Full background image */}
                       {client.coverUrl && (
-                        <div className="h-28 w-full relative border-b border-border-subtle -mt-4 -mx-4 mb-4 w-[calc(100%+2rem)]">
+                        <div className="absolute inset-0">
                           <img src={client.coverUrl} alt="Cover" className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-night/40 to-transparent backdrop-blur-[2px] pointer-events-none" />
                         </div>
                       )}
 
                       {isAdmin && (
-                        <div className="absolute top-2 right-2 text-mist-muted/20 group-hover:text-mist-muted cursor-grab z-10">
-                          <GripVertical size={14} className="drop-shadow-md" />
+                        <div className="absolute top-2 right-2 text-white/50 group-hover:text-white cursor-grab z-20 drop-shadow-lg">
+                          <GripVertical size={14} />
                         </div>
                       )}
 
-                      <div className="p-4 pt-0 relative z-10">
-                        <h4 className="font-montserrat font-bold text-mist text-lg pr-6 mb-1 truncate">
+                      {/* Glassmorphism content overlay */}
+                      <div className={`relative z-10 flex-1 flex flex-col p-4 ${client.coverUrl ? 'bg-night/70 backdrop-blur-md' : ''}`}>
+                        <h4 className="font-montserrat font-bold text-mist text-lg pr-6 mb-1 truncate drop-shadow-sm">
                           {client.nombre_empresa || 'Cliente Sin Nombre'}
                         </h4>
-                        <p className="text-[10px] uppercase font-bold text-neon-blue mb-3">
+                        <p className="text-[10px] uppercase font-bold text-neon-blue mb-3 drop-shadow-sm">
                           {client.sector || 'Sector N/A'}
                         </p>
 
                         <div className="space-y-2 mb-3 text-xs">
-                          <div className="flex items-center text-mist-muted">
-                            <UserIcon size={12} className="mr-2 text-mist-muted" />
+                          <div className="flex items-center text-mist/90">
+                            <UserIcon size={12} className="mr-2" />
                             <span className="truncate">{client.nombre_contacto || 'Sin encargado'}</span>
                           </div>
-                          <div className="flex items-center text-mist-muted">
-                            <Building2 size={12} className="mr-2 text-mist-muted" />
+                          <div className="flex items-center text-mist/90">
+                            <Building2 size={12} className="mr-2" />
                             <span className="truncate">
                               {Array.isArray(client.servicio_interes) 
                                 ? (client.servicio_interes.length > 0 ? client.servicio_interes.join(', ') : 'Servicio N/A')
                                 : (client.servicio_interes || 'Servicio N/A')}
                             </span>
                           </div>
-                          <div className="flex items-center text-mist-muted">
+                          <div className="flex items-center text-mist/90">
                             <Clock size={12} className="mr-2 text-neon-orange" />
                             <span>Corte: <span className="text-mist font-mono">{client.fecha_corte}</span></span>
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between bg-surface-low rounded p-2 border border-border-subtle">
-                          <div className="text-neon font-bold text-sm">
+                        <div className="mt-auto flex items-center justify-between bg-night/60 backdrop-blur-sm rounded p-2 border border-white/10">
+                          <div className="text-neon font-bold text-sm drop-shadow-sm">
                             ${client.valor_mensual_servicio}
                           </div>
                           {isAdmin ? (
@@ -217,12 +218,12 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
                               onClick={(e) => togglePayment(e, client.activeId)}
                               className={`flex items-center space-x-2 px-2 py-1 rounded border transition-colors ${
                                 client.pago_mes_actual 
-                                ? 'bg-neon/10 border-neon text-neon' 
-                                : 'bg-night border-mist-muted text-mist-muted hover:bg-white/5'
+                                ? 'bg-neon/20 border-neon text-neon' 
+                                : 'bg-night/50 border-white/20 text-mist/80 hover:bg-white/10'
                               }`}
                             >
                               <div className={`w-3 h-3 rounded-sm border flex items-center justify-center ${
-                                client.pago_mes_actual ? 'border-neon bg-neon text-night' : 'border-mist-muted'
+                                client.pago_mes_actual ? 'border-neon bg-neon text-night' : 'border-white/30'
                               }`}>
                                 {client.pago_mes_actual && <CheckSquare size={10} strokeWidth={4} />}
                               </div>
@@ -231,11 +232,11 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
                           ) : (
                             <div className={`flex items-center space-x-2 px-2 py-1 rounded border ${
                               client.pago_mes_actual 
-                              ? 'bg-neon/10 border-neon text-neon' 
-                              : 'bg-night border-mist-muted text-mist-muted'
+                              ? 'bg-neon/20 border-neon text-neon' 
+                              : 'bg-night/50 border-white/20 text-mist/80'
                             }`}>
                               <div className={`w-3 h-3 rounded-sm border flex items-center justify-center ${
-                                client.pago_mes_actual ? 'border-neon bg-neon text-night' : 'border-mist-muted'
+                                client.pago_mes_actual ? 'border-neon bg-neon text-night' : 'border-white/30'
                               }`}>
                                 {client.pago_mes_actual && <CheckSquare size={10} strokeWidth={4} />}
                               </div>
