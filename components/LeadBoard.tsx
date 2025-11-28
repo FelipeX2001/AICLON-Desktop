@@ -1,17 +1,20 @@
 
 import React, { useState, useRef } from 'react';
-import { Lead, LEAD_STAGES, LeadStage, LeadMilestones, User, ActiveClient, DroppedClient } from '../types';
+import { Lead, LEAD_STAGES, LeadStage, LeadMilestones, User, ActiveClient, DroppedClient, MeetingEvent } from '../types';
 import LeadModal from './LeadModal';
 import LeadViewModal from './LeadViewModal';
-import { Plus, GripVertical, Briefcase, ArrowRightCircle, X, Save, DollarSign, Calendar, User as UserIcon } from 'lucide-react';
+import MeetingModal from './MeetingModal';
+import { Plus, GripVertical, Briefcase, ArrowRightCircle, X, Save, DollarSign, Calendar, User as UserIcon, CalendarCheck } from 'lucide-react';
 
 interface LeadBoardProps {
   user?: User; 
   users?: User[];
   leads: Lead[];
+  activeClients?: ActiveClient[];
   onSaveLead: (lead: Lead) => void;
   onDeleteLead: (leadId: string) => void;
   onConvertToActiveClient?: (activeClient: ActiveClient) => void;
+  onSaveMeeting?: (meeting: MeetingEvent) => void;
 }
 
 const DEFAULT_MILESTONES: LeadMilestones = {
@@ -24,7 +27,9 @@ const DEFAULT_MILESTONES: LeadMilestones = {
   ia_activada: false
 };
 
-const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, onDeleteLead, onConvertToActiveClient }) => {
+const MEETING_STAGES: LeadStage[] = ['Reunión Inicial', 'Reunión Revisión Propuesta', 'Reunión de Capacitación'];
+
+const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, activeClients, onSaveLead, onDeleteLead, onConvertToActiveClient, onSaveMeeting }) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
@@ -38,6 +43,9 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
     fecha_corte: '',
     pago_mes: false
   });
+
+  const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
+  const [meetingClientName, setMeetingClientName] = useState('');
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isDraggingScroll = useRef(false);
@@ -95,6 +103,20 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
       pago_mes: false
     });
     setIsConversionModalOpen(true);
+  };
+
+  const openMeetingModal = (e: React.MouseEvent, lead: Lead) => {
+    e.stopPropagation();
+    setMeetingClientName(lead.nombre_empresa || '');
+    setIsMeetingModalOpen(true);
+  };
+
+  const handleSaveMeetingLocal = (meeting: MeetingEvent) => {
+    if (onSaveMeeting) {
+      onSaveMeeting(meeting);
+    }
+    setIsMeetingModalOpen(false);
+    setMeetingClientName('');
   };
 
   const handleConvertClient = (e: React.FormEvent) => {
@@ -274,6 +296,15 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
                         </button>
                       )}
 
+                      {isAdmin && MEETING_STAGES.includes(stage) && onSaveMeeting && (
+                        <button
+                          onClick={(e) => openMeetingModal(e, lead)}
+                          className="mt-3 w-full py-1.5 rounded bg-neon-blue/10 border border-neon-blue/30 text-neon-blue text-xs font-bold uppercase hover:bg-neon-blue hover:text-night transition-all flex items-center justify-center"
+                        >
+                          Reunión Agendada <CalendarCheck size={12} className="ml-1.5" />
+                        </button>
+                      )}
+
                       {lead.comentarios && (
                         <div className="absolute bottom-2 right-2 w-1.5 h-1.5 bg-neon-orange rounded-full animate-pulse" title="Tiene comentarios"></div>
                       )}
@@ -380,6 +411,20 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, onSaveLead, o
           users={users || []}
           currentUser={user}
           onEdit={handleEditFromView}
+        />
+      )}
+
+      {onSaveMeeting && (
+        <MeetingModal
+          isOpen={isMeetingModalOpen}
+          onClose={() => { setIsMeetingModalOpen(false); setMeetingClientName(''); }}
+          onSave={handleSaveMeetingLocal}
+          users={users || []}
+          clients={[
+            ...leads.filter(l => !l.isDeleted && !l.isConverted).map(l => l.nombre_empresa).filter(Boolean) as string[],
+            ...(activeClients || []).filter(c => !c.isDeleted).map(c => c.nombre_empresa).filter(Boolean) as string[]
+          ]}
+          defaultClientName={meetingClientName}
         />
       )}
     </div>

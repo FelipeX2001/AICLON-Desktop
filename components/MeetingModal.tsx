@@ -13,6 +13,7 @@ interface MeetingModalProps {
   users: User[];
   clients: string[];
   defaultAttendeeId?: string;
+  defaultClientName?: string;
 }
 
 const MeetingModal: React.FC<MeetingModalProps> = ({ 
@@ -23,7 +24,8 @@ const MeetingModal: React.FC<MeetingModalProps> = ({
   meetingToEdit, 
   users, 
   clients,
-  defaultAttendeeId 
+  defaultAttendeeId,
+  defaultClientName
 }) => {
   const [formData, setFormData] = useState<Partial<MeetingEvent>>({
     date: new Date().toISOString().split('T')[0],
@@ -45,17 +47,17 @@ const MeetingModal: React.FC<MeetingModalProps> = ({
           startTime: '10:00',
           endTime: '11:00',
           attendeeIds: defaultAttendeeId ? [defaultAttendeeId] : [],
-          title: '',
+          title: defaultClientName ? `Reunión con ${defaultClientName}` : '',
           description: '',
           link: '',
-          clientId: '',
+          clientId: defaultClientName || '',
           isRemote: true,
           coverPosition: { x: 50, y: 50, zoom: 1 }
         });
       }
       setIsDeleteConfirmOpen(false);
     }
-  }, [isOpen, meetingToEdit]);
+  }, [isOpen, meetingToEdit, defaultClientName]);
 
   // Auto Set End Time: Start + 1h if End is empty or same
   const handleStartTimeChange = (newStart: string) => {

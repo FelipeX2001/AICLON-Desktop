@@ -932,9 +932,11 @@ const App: React.FC = () => {
             user={currentUser!} 
             users={validUsers}
             leads={validLeads}
+            activeClients={validActiveClients}
             onSaveLead={handleSaveLead}
             onDeleteLead={handleDeleteLead}
             onConvertToActiveClient={handleSaveActiveClient}
+            onSaveMeeting={handleSaveMeeting}
           />
         );
       case 'clients-general':
