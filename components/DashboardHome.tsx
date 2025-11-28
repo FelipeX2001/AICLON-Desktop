@@ -33,7 +33,10 @@ const shortcuts = [
 ];
 
 const DashboardHome: React.FC<DashboardHomeProps> = ({ user, users = [], tasks = [], meetings = [], demos = [], leads = [], activeClients = [], onSaveDemo, onDeleteDemo, onSaveTask, onDeleteTask }) => {
-  const today = new Date().toISOString().split('T')[0];
+  const toLocalDateString = (d: Date) => {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+  const today = toLocalDateString(new Date());
   
   const myTasksToday = tasks.filter(t => 
     !t.isDeleted &&

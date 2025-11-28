@@ -22,6 +22,10 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, lead
   const [editingEvent, setEditingEvent] = useState<MeetingEvent | null>(null);
   const [viewingEvent, setViewingEvent] = useState<MeetingEvent | null>(null);
 
+  const toLocalDateString = (d: Date) => {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
   const clients = useMemo(() => {
     const clientNames = new Set<string>();
     leads.forEach(l => { if (l.nombre_empresa) clientNames.add(l.nombre_empresa); });
@@ -175,7 +179,7 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, lead
                   ))}
 
                   {validMeetings
-                    .filter(e => e.date === day.toISOString().split('T')[0])
+                    .filter(e => e.date === toLocalDateString(day))
                     .map(event => (
                       <div
                         key={event.id}
