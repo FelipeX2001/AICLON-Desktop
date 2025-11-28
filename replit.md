@@ -118,8 +118,13 @@ Deployment configured with autoscale:
   - Stages with indicator: "Reunión Inicial", "Reunión Revisión Propuesta", "Reunión de Capacitación"
 - **Glassmorphism Effect on Images**: Enhanced visual effect on image overlays
   - MeetingsView: Cover images now show as full card background with glassmorphism content overlay
-  - ActiveClientsBoard: Image gradient uses semi-transparency (via-night/40) and backdrop-blur
+  - ActiveClientsBoard: Full-card background images with glass overlay (bg-night/70 backdrop-blur-md)
+  - Cards have minimum height of 200px for consistent sizing
   - Allows more of the cover image to be visible through the content area
+- **Virtual Client "AICLON (Interno)"**: For internal tasks and meetings
+  - Always appears as first option in client selection for Tasks and Meetings
+  - Allows assigning internal company activities without creating actual client records
+  - Useful for team meetings, internal tasks, and company planning
 - **Searchable Client Selection**: MeetingModal and TaskModal now use SearchableSelect component
   - Type-to-filter functionality for client field
   - Dropdown with matching options
