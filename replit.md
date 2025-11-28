@@ -110,7 +110,28 @@ Deployment configured with autoscale:
 - Production port: 5000 (configurable via PORT env variable)
 - Backend runs compiled JavaScript (no ts-node overhead) for faster startup
 
-## Recent Changes (Nov 27, 2025)
+## Recent Changes (Nov 28, 2025)
+- **Searchable Client Selection**: MeetingModal and TaskModal now use SearchableSelect component
+  - Type-to-filter functionality for client field
+  - Dropdown with matching options
+  - Allows custom values when typing
+  - Replaces traditional select elements for better UX with many clients
+- **SearchableSelect Component**: New reusable component (components/SearchableSelect.tsx)
+  - Combines text input with filtered dropdown
+  - Click-outside detection to close dropdown
+  - Clear button to reset selection
+  - Support for required fields and custom values
+- **ClientsDashboard Search**: Added search fields with magnifying glass icon for all three columns
+  - Active Clients: Search by company name
+  - Pipeline (Leads): Search by company or contact name
+  - Dropped Clients: Search by company name
+  - Each search has clear button (X) and filtered results with empty state messages
+- **LeadBoard Meeting Button**: "Reunión Agendada" button appears only in meeting-related stages
+  - Columns with button: "Reunión Inicial", "Reunión Revisión Propuesta", "Reunión de Capacitación"
+  - Opens MeetingModal with pre-filled client name from lead
+  - Respects role permissions (only visible to admins)
+
+## Previous Changes (Nov 27, 2025)
 - **Multi-selection for Servicio de Interés**: Field changed from single-select to multi-select
   - Database migration: Changed servicioInteres from varchar to jsonb array
   - LeadModal: Changed from dropdown to checkboxes for selecting multiple services
