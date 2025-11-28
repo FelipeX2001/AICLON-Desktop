@@ -64,12 +64,34 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const taskData = transformTaskFromClient(req.body);
+    console.log('POST /tasks - Received body:', JSON.stringify(req.body, null, 2));
+    
+    const body = req.body;
+    const taskData = {
+      title: body.title || 'Sin título',
+      description: body.description || '',
+      status: body.status || 'Pendiente',
+      assigneeIds: Array.isArray(body.assigneeIds) ? body.assigneeIds.map((id: any) => Number(id)) : [],
+      clientName: body.clientName || '',
+      priority: body.priority || 'Media',
+      deadline: body.deadline || null,
+      comments: body.comments || '',
+      subtasks: body.subtasks || [],
+      coverUrl: body.coverUrl || null,
+      coverPosition: body.coverPosition || null,
+    };
+    
+    console.log('POST /tasks - Transformed data:', JSON.stringify(taskData, null, 2));
+    
     const [newTask] = await db.insert(tasks).values(taskData).returning();
+    console.log('POST /tasks - Created task:', newTask.id);
+    
     res.status(201).json(transformTaskForClient(newTask));
-  } catch (error) {
+  } catch (error: any) {
     console.error('Create task error:', error);
-    res.status(500).json({ error: 'Error en el servidor' });
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ error: 'Error en el servidor: ' + error.message });
   }
 });
 
