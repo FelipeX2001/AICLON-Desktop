@@ -190,7 +190,10 @@ const LeadViewModal: React.FC<LeadViewModalProps> = ({
               </label>
               <div className="bg-surface-low/50 rounded-lg p-2 border border-border-subtle">
                 <span className="text-sm text-mist">
-                  {lead.fecha_primer_contacto ? new Date(lead.fecha_primer_contacto).toLocaleDateString('es-ES') : '-'}
+                  {lead.fecha_primer_contacto ? (() => {
+                    const [year, month, day] = lead.fecha_primer_contacto.split('-').map(Number);
+                    return new Date(year, month - 1, day).toLocaleDateString('es-ES');
+                  })() : '-'}
                 </span>
               </div>
             </div>

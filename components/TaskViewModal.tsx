@@ -145,12 +145,15 @@ const TaskViewModal: React.FC<TaskViewModalProps> = ({
             </label>
             <div className="bg-surface-low/50 rounded-lg p-2 border border-border-subtle">
               <span className="text-sm text-mist">
-                {task.deadline ? new Date(task.deadline).toLocaleDateString('es-ES', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                }) : 'Sin fecha'}
+                {task.deadline ? (() => {
+                  const [year, month, day] = task.deadline.split('-').map(Number);
+                  return new Date(year, month - 1, day).toLocaleDateString('es-ES', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  });
+                })() : 'Sin fecha'}
               </span>
             </div>
           </div>

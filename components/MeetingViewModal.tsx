@@ -24,8 +24,13 @@ const MeetingViewModal: React.FC<MeetingViewModalProps> = ({
   const attendees = users.filter(u => meeting.attendeeIds?.includes(u.id));
   const clientDisplayName = meeting.clientName || null;
 
+  const parseLocalDate = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('es-ES', {
+    return parseLocalDate(dateStr).toLocaleDateString('es-ES', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',

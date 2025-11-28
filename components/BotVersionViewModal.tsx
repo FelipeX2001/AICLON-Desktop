@@ -95,12 +95,15 @@ const BotVersionViewModal: React.FC<BotVersionViewModalProps> = ({
             </label>
             <div className="bg-surface-low/50 rounded-lg p-3 border border-border-subtle">
               <span className="text-sm text-mist">
-                {botVersion.date ? new Date(botVersion.date).toLocaleDateString('es-ES', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                }) : '-'}
+                {botVersion.date ? (() => {
+                  const [year, month, day] = botVersion.date.split('-').map(Number);
+                  return new Date(year, month - 1, day).toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  });
+                })() : '-'}
               </span>
             </div>
           </div>

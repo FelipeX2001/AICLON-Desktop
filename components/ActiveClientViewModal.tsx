@@ -96,7 +96,10 @@ const ActiveClientViewModal: React.FC<ActiveClientViewModalProps> = ({
                 </label>
                 <div className="bg-surface-low/50 rounded-lg p-2 border border-border-subtle">
                   <span className="text-sm text-mist">
-                    {client.fecha_corte ? new Date(client.fecha_corte).toLocaleDateString('es-ES') : '-'}
+                    {client.fecha_corte ? (() => {
+                      const [year, month, day] = client.fecha_corte.split('-').map(Number);
+                      return new Date(year, month - 1, day).toLocaleDateString('es-ES');
+                    })() : '-'}
                   </span>
                 </div>
               </div>
@@ -106,7 +109,10 @@ const ActiveClientViewModal: React.FC<ActiveClientViewModalProps> = ({
                 </label>
                 <div className="bg-surface-low/50 rounded-lg p-2 border border-border-subtle">
                   <span className="text-sm text-mist">
-                    {client.fecha_inicio_servicio ? new Date(client.fecha_inicio_servicio).toLocaleDateString('es-ES') : '-'}
+                    {client.fecha_inicio_servicio ? (() => {
+                      const [year, month, day] = client.fecha_inicio_servicio.split('-').map(Number);
+                      return new Date(year, month - 1, day).toLocaleDateString('es-ES');
+                    })() : '-'}
                   </span>
                 </div>
               </div>
