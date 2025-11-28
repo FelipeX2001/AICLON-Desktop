@@ -111,6 +111,15 @@ Deployment configured with autoscale:
 - Backend runs compiled JavaScript (no ts-node overhead) for faster startup
 
 ## Recent Changes (Nov 28, 2025)
+- **Lead Meeting Indicator**: Meeting-related stages in LeadBoard now show checkbox indicator
+  - Visual indicator: "Agendada" (cyan) when meeting exists, "Pendiente" (muted) when not
+  - Case-insensitive matching between lead company name and meeting client name
+  - "Agendar" button only appears when no meeting scheduled and user is admin
+  - Stages with indicator: "Reunión Inicial", "Reunión Revisión Propuesta", "Reunión de Capacitación"
+- **Glassmorphism Effect on Images**: Enhanced visual effect on image overlays
+  - MeetingsView: Cover images now show as full card background with glassmorphism content overlay
+  - ActiveClientsBoard: Image gradient uses semi-transparency (via-night/40) and backdrop-blur
+  - Allows more of the cover image to be visible through the content area
 - **Searchable Client Selection**: MeetingModal and TaskModal now use SearchableSelect component
   - Type-to-filter functionality for client field
   - Dropdown with matching options
