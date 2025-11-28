@@ -197,9 +197,9 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, activeClients
   };
 
   const hasMeetingScheduled = (lead: Lead) => {
-    const clientName = lead.nombre_empresa;
+    const clientName = lead.nombre_empresa?.toLowerCase().trim();
     if (!clientName) return false;
-    return meetings.some(m => !m.isDeleted && m.clientName === clientName);
+    return meetings.some(m => !m.isDeleted && m.clientName?.toLowerCase().trim() === clientName);
   };
 
   const isAdmin = user?.role === 'admin';

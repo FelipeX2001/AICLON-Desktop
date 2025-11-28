@@ -184,13 +184,15 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, lead
                         style={getEventStyle(event)}
                       >
                         {event.coverUrl ? (
-                          <div 
-                            className="h-6 w-full bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity"
-                            style={{ backgroundImage: `url(${event.coverUrl})` }}
-                          />
+                          <div className="absolute inset-0 overflow-hidden">
+                            <div 
+                              className="w-full h-full bg-cover bg-center opacity-60 group-hover:opacity-80 transition-opacity"
+                              style={{ backgroundImage: `url(${event.coverUrl})` }}
+                            />
+                          </div>
                         ) : null}
                         
-                        <div className="p-2 flex-1 flex flex-col">
+                        <div className={`p-2 flex-1 flex flex-col relative z-10 ${event.coverUrl ? 'bg-night/60 backdrop-blur-sm' : ''}`}>
                           <div className="flex justify-between items-start">
                             <span className="text-xs font-bold text-mist truncate">{event.title}</span>
                             {event.link && (

@@ -171,7 +171,7 @@ const ActiveClientsBoard: React.FC<ActiveClientsBoardProps> = ({
                       {client.coverUrl && (
                         <div className="h-28 w-full relative border-b border-border-subtle -mt-4 -mx-4 mb-4 w-[calc(100%+2rem)]">
                           <img src={client.coverUrl} alt="Cover" className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-night/90 to-transparent pointer-events-none" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-night/40 to-transparent backdrop-blur-[2px] pointer-events-none" />
                         </div>
                       )}
 
