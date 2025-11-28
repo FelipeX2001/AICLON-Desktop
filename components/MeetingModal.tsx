@@ -51,7 +51,7 @@ const MeetingModal: React.FC<MeetingModalProps> = ({
           title: defaultClientName ? `Reunión con ${defaultClientName}` : '',
           description: '',
           link: '',
-          clientId: defaultClientName || '',
+          clientName: defaultClientName || '',
           isRemote: true,
           coverPosition: { x: 50, y: 50, zoom: 1 }
         });
@@ -222,8 +222,8 @@ const MeetingModal: React.FC<MeetingModalProps> = ({
                   <span className="text-xs uppercase font-bold text-mist-muted">Cliente</span>
                 </div>
                 <SearchableSelect
-                    value={formData.clientId || ''}
-                    onChange={(val) => setFormData({...formData, clientId: val})}
+                    value={formData.clientName || ''}
+                    onChange={(val) => setFormData({...formData, clientName: val})}
                     options={clients}
                     placeholder="Buscar cliente..."
                     allowCustom={true}

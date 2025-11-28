@@ -30,7 +30,8 @@ import {
   tutorialsAPI, 
   notificationsAPI,
   droppedClientsAPI,
-  demosAPI
+  demosAPI,
+  settingsAPI
 } from './client';
 
 const App: React.FC = () => {
@@ -77,7 +78,8 @@ const App: React.FC = () => {
         botVersionsData,
         tutorialsData,
         demosData,
-        droppedClientsData
+        droppedClientsData,
+        settingsData
       ] = await Promise.all([
         usersAPI.getAll(),
         tasksAPI.getAll(),
@@ -87,7 +89,8 @@ const App: React.FC = () => {
         botVersionsAPI.getAll(),
         tutorialsAPI.getAll(),
         demosAPI.getAll(),
-        droppedClientsAPI.getAll()
+        droppedClientsAPI.getAll(),
+        settingsAPI.getAll().catch(() => ({}))
       ]);
 
       setUsers(usersData.map((u: any) => ({
@@ -181,6 +184,17 @@ const App: React.FC = () => {
         ...dc,
         id: String(dc.id)
       })));
+
+      const covers: Record<string, string> = {};
+      if (settingsData) {
+        Object.keys(settingsData).forEach(key => {
+          if (key.startsWith('bot_cover_')) {
+            const type = key.replace('bot_cover_', '');
+            covers[type] = settingsData[key];
+          }
+        });
+      }
+      setBotListCovers(covers);
 
     } catch (error) {
       console.error('Error loading data:', error);
@@ -427,7 +441,7 @@ const App: React.FC = () => {
           startTime: meeting.startTime,
           endTime: meeting.endTime,
           attendeeIds: meeting.attendeeIds.map(Number),
-          clientId: meeting.clientId ? Number(meeting.clientId) : null,
+          clientName: meeting.clientName || null,
           link: meeting.link,
           isRemote: meeting.isRemote,
           coverUrl: meeting.coverUrl,
@@ -436,7 +450,8 @@ const App: React.FC = () => {
         setMeetings(prev => prev.map(m => m.id === meeting.id ? {
           ...updated,
           id: String(updated.id),
-          attendeeIds: (updated.attendeeIds || []).map(String)
+          attendeeIds: (updated.attendeeIds || []).map(String),
+          clientName: updated.clientName || undefined
         } : m));
         
         meeting.attendeeIds.forEach(userId => {
@@ -452,7 +467,7 @@ const App: React.FC = () => {
           startTime: meeting.startTime,
           endTime: meeting.endTime,
           attendeeIds: meeting.attendeeIds.map(Number),
-          clientId: meeting.clientId ? Number(meeting.clientId) : null,
+          clientName: meeting.clientName || null,
           link: meeting.link,
           isRemote: meeting.isRemote,
           coverUrl: meeting.coverUrl,
@@ -461,7 +476,8 @@ const App: React.FC = () => {
         setMeetings(prev => [...prev, {
           ...created,
           id: String(created.id),
-          attendeeIds: (created.attendeeIds || []).map(String)
+          attendeeIds: (created.attendeeIds || []).map(String),
+          clientName: created.clientName || undefined
         }]);
         meeting.attendeeIds.forEach(userId => {
           addNotification(userId, `Nueva reunión: ${meeting.title}`, 'meeting_assigned', String(created.id));
@@ -842,8 +858,13 @@ const App: React.FC = () => {
     }
   };
 
-  const handleSaveBotListCover = (type: string, coverUrl: string) => {
+  const handleSaveBotListCover = async (type: string, coverUrl: string) => {
     setBotListCovers(prev => ({ ...prev, [type]: coverUrl }));
+    try {
+      await settingsAPI.update(`bot_cover_${type}`, coverUrl);
+    } catch (error) {
+      console.error('Error saving bot list cover:', error);
+    }
   };
 
   const handleOpenEditProfile = (user: User) => {

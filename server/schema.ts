@@ -58,7 +58,7 @@ export const meetings = pgTable('meetings', {
   startTime: varchar('start_time', { length: 50 }).notNull(),
   endTime: varchar('end_time', { length: 50 }).notNull(),
   attendeeIds: jsonb('attendee_ids').notNull().$type<number[]>(),
-  clientId: integer('client_id'),
+  clientName: varchar('client_name', { length: 255 }),
   link: text('link'),
   isRemote: boolean('is_remote').default(false),
   isDeleted: boolean('is_deleted').default(false),
@@ -233,3 +233,14 @@ export type DroppedClient = typeof droppedClients.$inferSelect;
 export type InsertDroppedClient = typeof droppedClients.$inferInsert;
 export type Demo = typeof demos.$inferSelect;
 export type InsertDemo = typeof demos.$inferInsert;
+
+export const appSettings = pgTable('app_settings', {
+  id: serial('id').primaryKey(),
+  key: varchar('key', { length: 100 }).notNull().unique(),
+  value: text('value'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type AppSetting = typeof appSettings.$inferSelect;
+export type InsertAppSetting = typeof appSettings.$inferInsert;

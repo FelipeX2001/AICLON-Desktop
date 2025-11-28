@@ -89,7 +89,7 @@ export interface MeetingEvent extends BaseEntity {
   startTime: string; // HH:mm
   endTime: string; // HH:mm
   attendeeIds: string[]; 
-  clientId?: string; 
+  clientName?: string; 
   link?: string; 
   isRemote: boolean;
 }

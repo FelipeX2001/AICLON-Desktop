@@ -22,7 +22,7 @@ const MeetingViewModal: React.FC<MeetingViewModalProps> = ({
   if (!isOpen || !meeting) return null;
 
   const attendees = users.filter(u => meeting.attendeeIds?.includes(u.id));
-  const clientName = meeting.clientId ? clients.find(c => c === meeting.clientId) || meeting.clientId : null;
+  const clientDisplayName = meeting.clientName || null;
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('es-ES', {
@@ -115,13 +115,13 @@ const MeetingViewModal: React.FC<MeetingViewModalProps> = ({
             </div>
           )}
 
-          {clientName && (
+          {clientDisplayName && (
             <div className="space-y-1">
               <label className="text-xs uppercase font-bold text-mist-muted flex items-center gap-2">
                 <Building2 size={14}/> Cliente
               </label>
               <div className="bg-surface-low/50 rounded-lg p-2 border border-border-subtle">
-                <span className="text-sm text-mist">{clientName}</span>
+                <span className="text-sm text-mist">{clientDisplayName}</span>
               </div>
             </div>
           )}

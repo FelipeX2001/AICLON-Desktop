@@ -259,3 +259,13 @@ export const demosAPI = {
       method: 'DELETE',
     }),
 };
+
+export const settingsAPI = {
+  getAll: () => fetchAPI<Record<string, string>>('/settings'),
+  
+  update: (key: string, value: string) =>
+    fetchAPI<{ success: boolean; key: string; value: string }>(`/settings/${key}`, {
+      method: 'PUT',
+      body: JSON.stringify({ value }),
+    }),
+};

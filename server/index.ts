@@ -15,6 +15,7 @@ import botVersionsRoutes from './routes/botVersions.js';
 import tutorialsRoutes from './routes/tutorials.js';
 import notificationsRoutes from './routes/notifications.js';
 import demosRoutes from './routes/demos.js';
+import settingsRoutes from './routes/settings.js';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use('/api/bot-versions', botVersionsRoutes);
 app.use('/api/tutorials', tutorialsRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/demos', demosRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });

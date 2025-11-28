@@ -527,7 +527,7 @@ const UserMeetingsTab: React.FC<UserMeetingsTabProps> = ({ user, users, meetings
     leads.forEach(l => { if (l.nombre_empresa) clientNames.add(l.nombre_empresa); });
     activeClients.forEach(c => { if (c.nombre_empresa) clientNames.add(c.nombre_empresa); });
     meetings.forEach(m => {
-      if (m.clientId) clientNames.add(m.clientId);
+      if (m.clientName) clientNames.add(m.clientName);
     });
     return Array.from(clientNames).sort();
   }, [leads, activeClients, meetings]);
