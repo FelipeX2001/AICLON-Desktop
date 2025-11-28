@@ -954,6 +954,7 @@ const App: React.FC = () => {
             users={validUsers}
             leads={validLeads}
             activeClients={validActiveClients}
+            meetings={validMeetings}
             onSaveLead={handleSaveLead}
             onDeleteLead={handleDeleteLead}
             onConvertToActiveClient={handleSaveActiveClient}

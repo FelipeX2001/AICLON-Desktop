@@ -4,13 +4,14 @@ import { Lead, LEAD_STAGES, LeadStage, LeadMilestones, User, ActiveClient, Dropp
 import LeadModal from './LeadModal';
 import LeadViewModal from './LeadViewModal';
 import MeetingModal from './MeetingModal';
-import { Plus, GripVertical, Briefcase, ArrowRightCircle, X, Save, DollarSign, Calendar, User as UserIcon, CalendarCheck } from 'lucide-react';
+import { Plus, GripVertical, Briefcase, ArrowRightCircle, X, Save, DollarSign, Calendar, User as UserIcon, CalendarCheck, CheckCircle2, Circle } from 'lucide-react';
 
 interface LeadBoardProps {
   user?: User; 
   users?: User[];
   leads: Lead[];
   activeClients?: ActiveClient[];
+  meetings?: MeetingEvent[];
   onSaveLead: (lead: Lead) => void;
   onDeleteLead: (leadId: string) => void;
   onConvertToActiveClient?: (activeClient: ActiveClient) => void;
@@ -29,7 +30,7 @@ const DEFAULT_MILESTONES: LeadMilestones = {
 
 const MEETING_STAGES: LeadStage[] = ['Reunión Inicial', 'Reunión Revisión Propuesta', 'Reunión de Capacitación'];
 
-const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, activeClients, onSaveLead, onDeleteLead, onConvertToActiveClient, onSaveMeeting }) => {
+const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, activeClients, meetings = [], onSaveLead, onDeleteLead, onConvertToActiveClient, onSaveMeeting }) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
@@ -195,6 +196,12 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, activeClients
     return Math.round((completed / total) * 100);
   };
 
+  const hasMeetingScheduled = (lead: Lead) => {
+    const clientName = lead.nombre_empresa;
+    if (!clientName) return false;
+    return meetings.some(m => !m.isDeleted && m.clientName === clientName);
+  };
+
   const isAdmin = user?.role === 'admin';
 
   const validLeads = leads.filter(l => !l.isDeleted && !l.isConverted);
@@ -296,13 +303,32 @@ const LeadBoard: React.FC<LeadBoardProps> = ({ user, users, leads, activeClients
                         </button>
                       )}
 
-                      {isAdmin && MEETING_STAGES.includes(stage) && onSaveMeeting && (
-                        <button
-                          onClick={(e) => openMeetingModal(e, lead)}
-                          className="mt-3 w-full py-1.5 rounded bg-neon-blue/10 border border-neon-blue/30 text-neon-blue text-xs font-bold uppercase hover:bg-neon-blue hover:text-night transition-all flex items-center justify-center"
-                        >
-                          Reunión Agendada <CalendarCheck size={12} className="ml-1.5" />
-                        </button>
+                      {MEETING_STAGES.includes(stage) && (
+                        <div className="mt-3 flex items-center gap-2">
+                          <div 
+                            className={`flex items-center gap-1.5 px-2 py-1.5 rounded border text-xs font-medium ${
+                              hasMeetingScheduled(lead) 
+                                ? 'bg-[#00C8FF]/10 border-[#00C8FF]/30 text-[#00C8FF]' 
+                                : 'bg-surface-low border-border-subtle text-mist-muted'
+                            }`}
+                            title={hasMeetingScheduled(lead) ? 'Reunión agendada' : 'Sin reunión agendada'}
+                          >
+                            {hasMeetingScheduled(lead) ? (
+                              <CheckCircle2 size={14} className="text-[#00C8FF]" />
+                            ) : (
+                              <Circle size={14} className="text-mist-muted" />
+                            )}
+                            <span className="hidden sm:inline">{hasMeetingScheduled(lead) ? 'Agendada' : 'Pendiente'}</span>
+                          </div>
+                          {isAdmin && onSaveMeeting && !hasMeetingScheduled(lead) && (
+                            <button
+                              onClick={(e) => openMeetingModal(e, lead)}
+                              className="flex-1 py-1.5 rounded bg-neon-blue/10 border border-neon-blue/30 text-neon-blue text-xs font-bold uppercase hover:bg-neon-blue hover:text-night transition-all flex items-center justify-center"
+                            >
+                              Agendar <CalendarCheck size={12} className="ml-1.5" />
+                            </button>
+                          )}
+                        </div>
                       )}
 
                       {lead.comentarios && (
