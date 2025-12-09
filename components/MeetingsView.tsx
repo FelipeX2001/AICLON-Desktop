@@ -42,6 +42,7 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, lead
   }, [leads, activeClients, meetings]);
 
   useEffect(() => {
+    console.log('MeetingsView mounted, checking Google Calendar status...');
     checkGoogleCalendarStatus();
   }, []);
 
@@ -53,7 +54,9 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, lead
 
   const checkGoogleCalendarStatus = async () => {
     try {
+      console.log('Checking Google Calendar status...');
       const status = await googleCalendarAPI.getStatus();
+      console.log('Google Calendar status:', status);
       setGoogleCalendarConnected(status.connected);
     } catch (error) {
       console.error('Error checking Google Calendar status:', error);
@@ -259,22 +262,29 @@ const MeetingsView: React.FC<MeetingsViewProps> = ({ user, users, meetings, lead
             {startOfWeek.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
           </span>
           
-          {googleCalendarConnected && (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 px-2 py-1 bg-green-500/10 border border-green-500/30 rounded text-green-400 text-xs">
+          <div className="flex items-center gap-2">
+            {googleCalendarConnected ? (
+              <>
+                <div className="flex items-center gap-1 px-2 py-1 bg-green-500/10 border border-green-500/30 rounded text-green-400 text-xs">
+                  <Calendar size={12} />
+                  <span>Google Calendar</span>
+                </div>
+                <button 
+                  onClick={fetchGoogleEvents}
+                  disabled={isLoadingGoogle}
+                  className="p-1 hover:bg-surface-med rounded text-mist-muted hover:text-neon transition-colors disabled:opacity-50"
+                  title="Actualizar eventos"
+                >
+                  <RefreshCw size={14} className={isLoadingGoogle ? 'animate-spin' : ''} />
+                </button>
+              </>
+            ) : (
+              <div className="flex items-center gap-1 px-2 py-1 bg-yellow-500/10 border border-yellow-500/30 rounded text-yellow-400 text-xs">
                 <Calendar size={12} />
-                <span>Google Calendar</span>
+                <span>Conectando...</span>
               </div>
-              <button 
-                onClick={fetchGoogleEvents}
-                disabled={isLoadingGoogle}
-                className="p-1 hover:bg-surface-med rounded text-mist-muted hover:text-neon transition-colors disabled:opacity-50"
-                title="Actualizar eventos"
-              >
-                <RefreshCw size={14} className={isLoadingGoogle ? 'animate-spin' : ''} />
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
         
         <div className="flex items-center gap-3">
