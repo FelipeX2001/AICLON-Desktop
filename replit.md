@@ -110,7 +110,18 @@ Deployment configured with autoscale:
 - Production port: 5000 (configurable via PORT env variable)
 - Backend runs compiled JavaScript (no ts-node overhead) for faster startup
 
-## Recent Changes (Nov 28, 2025)
+## Recent Changes (Dec 9, 2025)
+- **Google Calendar Integration**: Full integration with Google Calendar for the Meetings section
+  - Connected via Replit's Google Calendar connector (OAuth managed automatically)
+  - MeetingsView shows events from both local database and Google Calendar
+  - "Crear con Meet" checkbox to automatically generate Google Meet links when creating meetings
+  - Google Calendar events display with blue accent (Calendar icon) vs local meetings (cyan)
+  - Video icon for meetings with Google Meet links for quick access
+  - Refresh button to sync latest Google Calendar events
+  - Events created with Meet link are synced to Google Calendar and include hangoutLink
+  - Files: server/googleCalendar.ts (helper), server/routes/googleCalendar.ts (API), MeetingsView.tsx (UI)
+
+## Previous Changes (Nov 28, 2025)
 - **Lead Meeting Indicator**: Meeting-related stages in LeadBoard now show checkbox indicator
   - Visual indicator: "Agendada" (cyan) when meeting exists, "Pendiente" (muted) when not
   - Case-insensitive matching between lead company name and meeting client name
