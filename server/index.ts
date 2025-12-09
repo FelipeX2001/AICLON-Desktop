@@ -16,6 +16,7 @@ import tutorialsRoutes from './routes/tutorials.js';
 import notificationsRoutes from './routes/notifications.js';
 import demosRoutes from './routes/demos.js';
 import settingsRoutes from './routes/settings.js';
+import googleCalendarRoutes from './routes/googleCalendar.js';
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use('/api/tutorials', tutorialsRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/demos', demosRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/google-calendar', googleCalendarRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });

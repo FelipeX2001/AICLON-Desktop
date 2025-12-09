@@ -269,3 +269,62 @@ export const settingsAPI = {
       body: JSON.stringify({ value }),
     }),
 };
+
+export interface GoogleCalendarEvent {
+  id: string;
+  googleEventId: string;
+  title: string;
+  description: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  link: string;
+  meetLink: string | null;
+  calendarLink: string | null;
+  attendees?: string[];
+  isGoogleEvent: boolean;
+}
+
+export const googleCalendarAPI = {
+  getStatus: () => fetchAPI<{ connected: boolean }>('/google-calendar/status'),
+  
+  getEvents: (timeMin?: string, timeMax?: string) => {
+    const params = new URLSearchParams();
+    if (timeMin) params.append('timeMin', timeMin);
+    if (timeMax) params.append('timeMax', timeMax);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return fetchAPI<GoogleCalendarEvent[]>(`/google-calendar/events${query}`);
+  },
+  
+  createEvent: (event: {
+    title: string;
+    description?: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    attendees?: string[];
+    createMeetLink?: boolean;
+  }) =>
+    fetchAPI<GoogleCalendarEvent>('/google-calendar/events', {
+      method: 'POST',
+      body: JSON.stringify(event),
+    }),
+
+  updateEvent: (eventId: string, event: {
+    title: string;
+    description?: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    attendees?: string[];
+  }) =>
+    fetchAPI<GoogleCalendarEvent>(`/google-calendar/events/${eventId}`, {
+      method: 'PUT',
+      body: JSON.stringify(event),
+    }),
+
+  deleteEvent: (eventId: string) =>
+    fetchAPI<{ success: boolean }>(`/google-calendar/events/${eventId}`, {
+      method: 'DELETE',
+    }),
+};
